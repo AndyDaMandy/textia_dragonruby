@@ -1,10 +1,11 @@
+#shows character status
 def show_status(args, char, slot)
   if slot == 1
-    x = 300   
+    x = 200   
   elsif slot == 2
-    x = 500
+    x = 400
   elsif slot == 3
-    x = 700
+    x = 600
   end
   y = 540
   args.outputs.labels  << [x, y, char.name, 5, 1]
@@ -18,6 +19,7 @@ def show_status(args, char, slot)
   args.outputs.labels  << [x, y - 240, "Luck: #{char.luck}", 5, 1]
   args.outputs.labels  << [x, y - 270, "exp: #{char.exp}", 5, 1]
 end
+#levels up a character
 def level_up(char)
   char.level += 1
   char.hp += 1
@@ -31,7 +33,7 @@ def level_up(char)
   char.luck += 1
   char.exp += 1
 end
-
+#this moves through the mains screen and renders battle buttons
 def main_screen(args, state)
   x = 500
   y = 540
@@ -39,16 +41,33 @@ def main_screen(args, state)
     args.outputs.labels << [x, y, 'Amaryllis Town\n
       Shaman: "Hello Ando and Marie, today is the day of your pilgrimage."\n
       Our town needs a new crystal and you both are going to the Crystal Lake to gather one for us
-      Without it we cannot protect ourselves from monsters much longer.
-      To access the menu, click the "Menu" button above. You can check your items, party, skills, etc.
-      "If you click the tutorial button you can learn a lot about how to survive. Dont go into the wilderness unprepared! You can access it at any time, so if youre ever confused you can open it again."
+      Without it we cannot protect ourselves from monsters much longer.\n
+      To access the menu, click the "Menu" button above. You can check your items, party, skills, etc.\n
+      "If you click the tutorial button you can learn a lot about how to survive. Dont go into the wilderness unprepared! You can access it at any time, so if youre ever confused you can open it again."\n
       "If youd like to move on, click below, or click the shop button above"', 5, 1]
   elsif state == 1
     args.outputs.labels << [x, y, "testing this!", 5, 1]
   end
 end
+def battle(args, state)
+end
 
+#game
 def tick args
+  game = [
+    #one
+    'Amaryllis Town
+    Shaman: "Hello Ando and Marie, today is the day of your pilgrimage."
+    Our town needs a new crystal and you both are going to the Crystal Lake to gather one for us
+    Without it we cannot protect ourselves from monsters much longer.
+    To access the menu, click the "Menu" button above. You can check your items, party, skills, etc.
+    "If you click the tutorial button you can learn a lot about how to survive. Dont go into the wilderness unprepared! You can access it at any time, so if youre ever confused you can open it again."
+    "If youd like to move on, click below, or click the shop button above"',
+    #two
+    "The Forest
+          You've found yourself in a mysterious forest. It's full of danger at every turn.
+          You're worried the danger might be too high, maybe you should head back to town?"
+  ]
   #chars states
   args.state.ando ||= {
     name: 'Ando',
@@ -127,10 +146,7 @@ def tick args
     type: 'Player'
   }
   #enemies states
-  # length of characters on line
-  max_character_length = 80
-  # line height
-  line_height = 25
+
 
   #args.state.screen ||= 0
   #main_screen(args, args.state.screen)
@@ -138,12 +154,30 @@ def tick args
   #show_status(args, args.state.marie, 2)
   #show_status(args, args.state.julie, 3)
   # create a really long string
-  args.state.really_long_string =  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vulputate viverra metus et vehicula. Aenean quis accumsan dolor. Nulla tempus, ex et lacinia elementum, nisi felis ullamcorper sapien, sed sagittis sem justo eu lectus. Etiam ut vehicula lorem, nec placerat ligula. Duis varius ultrices magna non sagittis. Aliquam et sem vel risus viverra hendrerit. Maecenas dapibus congue lorem, a blandit mauris feugiat sit amet."
-  args.state.really_long_string += "\n"
-  args.state.really_long_string += "Sed quis metus lacinia mi dapibus fermentum nec id nunc. Donec tincidunt ante a sem bibendum, eget ultricies ex mollis. Quisque venenatis erat quis pretium bibendum. Pellentesque vel laoreet nibh. Cras gravida nisi nec elit pulvinar, in feugiat leo blandit. Quisque sodales quam sed congue consequat. Vivamus placerat risus vitae ex feugiat viverra. In lectus arcu, pellentesque vel ipsum ac, dictum finibus enim. Quisque consequat leo in urna dignissim, eu tristique ipsum accumsan. In eros sem, iaculis ac rhoncus eu, laoreet vitae ipsum. In sodales, ante eu tempus vehicula, mi nulla luctus turpis, eu egestas leo sapien et mi."
+=begin
+  args.state.really_long_string =  {
+    one: 'Amaryllis Town
+        Shaman: "Hello Ando and Marie, today is the day of your pilgrimage."
+        Our town needs a new crystal and you both are going to the Crystal Lake to gather one for us
+        Without it we cannot protect ourselves from monsters much longer.
+        To access the menu, click the "Menu" button above. You can check your items, party, skills, etc.
+        "If you click the tutorial button you can learn a lot about how to survive. Dont go into the wilderness unprepared! You can access it at any time, so if youre ever confused you can open it again."
+        "If youd like to move on, click below, or click the shop button above"',
+    two: "The Forest
+        You've found yourself in a mysterious forest. It's full of danger at every turn.
+        You're worried the danger might be too high, maybe you should head back to town?"
+  }
+=end
+args.state.game_state ||= 0
 
-  
-
+args.state.really_long_string ||= game[args.state.game_state]
+ # args.state.really_long_string += "\n"
+ # args.state.really_long_string += "Sed quis metus lacinia mi dapibus fermentum nec id nunc. Donec tincidunt ante a sem bibendum, eget ultricies ex mollis. Quisque venenatis erat quis pretium bibendum. Pellentesque vel laoreet nibh. Cras gravida nisi nec elit pulvinar, in feugiat leo blandit. Quisque sodales quam sed congue consequat. ddVivamus placerat risus vitae ex feugiat viverra. In lectus arcu, pellentesque vel ipsum ac, dictum finibus enim. Quisque consequat leo in urna dignissim, eu tristique ipsum accumsan. In eros sem, iaculis ac rhoncus eu, laoreet vitae ipsum. In sodales, ante eu tempus vehicula, mi nulla luctus turpis, eu egestas leo sapien et mi."
+#linebreak variables
+# length of characters on line
+  max_character_length = 80
+# line height
+  line_height = 25
   long_string = args.state.really_long_string
 
   # API: args.string.wrapped_lines string, max_character_length
@@ -161,7 +195,8 @@ def tick args
     level_up(args.state.ando)
   end
   if args.inputs.keyboard.key_down.j
-    args.state.screen += 1
+    args.state.game_state += 1
+    args.state.really_long_string  = game[args.state.game_state]
   end
  # args.outputs.labels  << [640, 540, args.state.ando.name, 5, 1]
  # args.outputs.labels  << [640, 500, "hp: #{args.state.ando.hp}", 5, 1]
