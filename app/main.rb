@@ -74,6 +74,18 @@ end
 def battle(args, state)
 end
 
+def output_world(args, string)
+
+  args.outputs.labels << string.map_with_index do |s, i|
+    line_height = 25
+    {
+      x: 60,
+      y: 60.from_top - (i * line_height),
+      text: s
+    }
+  end
+end
+
 #game
 def tick args
   game = [
@@ -91,8 +103,8 @@ def tick args
           You're worried the danger might be too high, maybe you should head back to town?"
   ]
   #chars states
-  args.state.ando ||= Character.new("Ando", 1, 15, 15, 5, 5, 10, 4, 1, 2, 1, 0, [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}], [], [], "Sword", "Player")
-=begin
+  #args.state.ando ||= Character.new("Ando", 1, 15, 15, 5, 5, 10, 4, 1, 2, 1, 0, [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}], [], [], "Sword", "Player")
+
   args.state.ando ||= {
     name: 'Ando',
     level: 1,
@@ -112,7 +124,6 @@ def tick args
     weapon: 'Text',
     type: 'Player'
   }
-=end
   args.state.marie ||= {
     name: 'Marie',
     level: 1,
@@ -172,6 +183,9 @@ def tick args
   }
   #enemies states
 
+  #gamestate
+  args.state.game_state ||= 0
+  args.state.really_long_string ||= game[args.state.game_state]
 
   #args.state.screen ||= 0
   #main_screen(args, args.state.screen)
@@ -193,22 +207,19 @@ def tick args
         You're worried the danger might be too high, maybe you should head back to town?"
   }
 =end
-args.state.game_state ||= 0
-
-args.state.really_long_string ||= game[args.state.game_state]
- # args.state.really_long_string += "\n"
- # args.state.really_long_string += "Sed quis metus lacinia mi dapibus fermentum nec id nunc. Donec tincidunt ante a sem bibendum, eget ultricies ex mollis. Quisque venenatis erat quis pretium bibendum. Pellentesque vel laoreet nibh. Cras gravida nisi nec elit pulvinar, in feugiat leo blandit. Quisque sodales quam sed congue consequat. ddVivamus placerat risus vitae ex feugiat viverra. In lectus arcu, pellentesque vel ipsum ac, dictum finibus enim. Quisque consequat leo in urna dignissim, eu tristique ipsum accumsan. In eros sem, iaculis ac rhoncus eu, laoreet vitae ipsum. In sodales, ante eu tempus vehicula, mi nulla luctus turpis, eu egestas leo sapien et mi."
 #linebreak variables
 # length of characters on line
   max_character_length = 80
 # line height
-  line_height = 25
+  #line_height = 25
   long_string = args.state.really_long_string
 
   # API: args.string.wrapped_lines string, max_character_length
   long_strings_split = args.string.wrapped_lines long_string, max_character_length
 
+  output_world(args, long_strings_split)
   # render a label for each line and offset by the line_height
+=begin
   args.outputs.labels << long_strings_split.map_with_index do |s, i|
     {
       x: 60,
@@ -216,9 +227,16 @@ args.state.really_long_string ||= game[args.state.game_state]
       text: s
     }
   end
+=end
+
+  #gameflow is as follows gamestate is equal to a number
+  #Next I need buttons to control game flow
+  #importantly, I need a way to make sure that the button matches the correct location, similarly to the original textia
+
   if args.inputs.keyboard.key_down.z
     level_up(args.state.ando)
   end
+
   if args.inputs.keyboard.key_down.j
     args.state.game_state += 1
     args.state.really_long_string  = game[args.state.game_state]
