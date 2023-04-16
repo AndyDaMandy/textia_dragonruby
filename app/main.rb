@@ -1,4 +1,26 @@
 #shows character status
+class Character
+  attr_accessor :name, :level, :hp, :chp, :mp, :cmp, :pAtk, :pDef, :mAtk, :mDef, :luck, :exp, :buff, :skills, :support, :weapon, :type
+  def initialize(name, level, hp, chp, mp, cmp, pAtk, pDef, mAtk, mDef, luck, exp, buff, skills, support, weapon, type)
+    @name = name
+    @level = level
+    @hp = hp
+    @chp = chp
+    @mp = mp
+    @pAtk = pAtk
+    @pdef = pDef
+    @mAtk = mAtk
+    @mDef = mDef
+    @luck = luck
+    @exp = exp
+    @buff = buff
+    @skills = skills
+    @support = support
+    @weapon = weapon
+    @type = type
+  end
+end
+
 def show_status(args, char, slot)
   if slot == 1
     x = 200   
@@ -69,6 +91,8 @@ def tick args
           You're worried the danger might be too high, maybe you should head back to town?"
   ]
   #chars states
+  args.state.ando ||= Character.new("Ando", 1, 15, 15, 5, 5, 10, 4, 1, 2, 1, 0, [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}], [], [], "Sword", "Player")
+=begin
   args.state.ando ||= {
     name: 'Ando',
     level: 1,
@@ -88,6 +112,7 @@ def tick args
     weapon: 'Text',
     type: 'Player'
   }
+=end
   args.state.marie ||= {
     name: 'Marie',
     level: 1,
