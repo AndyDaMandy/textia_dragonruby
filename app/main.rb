@@ -85,6 +85,11 @@ def output_world(args, string)
     }
   end
 end
+def battle_screen(args)
+  x = 500
+  y = 540
+  args.outputs.labels << [x, y, "Battle!", 5, 1]
+end
 
 #game
 def tick args
@@ -186,6 +191,7 @@ def tick args
   #gamestate
   args.state.game_state ||= 0
   args.state.really_long_string ||= game[args.state.game_state]
+  args.state.battle_state ||= false
 
   #args.state.screen ||= 0
   #main_screen(args, args.state.screen)
@@ -217,17 +223,13 @@ def tick args
   # API: args.string.wrapped_lines string, max_character_length
   long_strings_split = args.string.wrapped_lines long_string, max_character_length
 
-  output_world(args, long_strings_split)
-  # render a label for each line and offset by the line_height
-=begin
-  args.outputs.labels << long_strings_split.map_with_index do |s, i|
-    {
-      x: 60,
-      y: 60.from_top - (i * line_height),
-      text: s
-    }
+  #checks if in battle mode or not
+  if (args.state.battle_state == false)
+    output_world(args, long_strings_split)
+  else
+    battle_screen(args)
   end
-=end
+
 
   #gameflow is as follows gamestate is equal to a number
   #Next I need buttons to control game flow
@@ -240,6 +242,12 @@ def tick args
   if args.inputs.keyboard.key_down.j
     args.state.game_state += 1
     args.state.really_long_string  = game[args.state.game_state]
+  end
+  if args.inputs.keyboard.key_down.m
+    args.state.battle_state = true
+  end
+  if args.inputs.keyboard.key_down.n
+    args.state.battle_state = false
   end
  # args.outputs.labels  << [640, 540, args.state.ando.name, 5, 1]
  # args.outputs.labels  << [640, 500, "hp: #{args.state.ando.hp}", 5, 1]
