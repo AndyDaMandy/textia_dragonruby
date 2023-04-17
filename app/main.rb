@@ -91,6 +91,29 @@ def battle_screen(args)
   args.outputs.labels << [x, y, "Battle!", 5, 1]
 end
 
+def small_label args, x, row, message
+  { x: x, y: row_to_px(args, row), text: message, size_enum: -2 }
+end
+
+def row_to_px args, row_number
+  args.grid.top.shift_down(5).shift_down(20 * row_number)
+end
+
+def tick_instructions args, text, y = 715
+  return if args.state.key_event_occurred
+  if args.inputs.mouse.click ||
+     args.inputs.keyboard.directional_vector ||
+     args.inputs.keyboard.key_down.enter ||
+     args.inputs.keyboard.key_down.escape
+    args.state.key_event_occurred = true
+  end
+
+  args.outputs.debug << { x: 0,   y: y - 50, w: 1280, h: 60 }.solid!
+  args.outputs.debug << { x: 640, y: y, text: text, size_enum: 1, alignment_enum: 1, r: 255, g: 255, b: 255 }.label!
+  args.outputs.debug << { x: 640, y: y - 25, text: "(click to dismiss instructions)", size_enum: -2, alignment_enum: 1, r: 255, g: 255, b: 255 }.label!
+end
+
+
 #game
 def tick args
   game = [
@@ -249,6 +272,31 @@ def tick args
   if args.inputs.keyboard.key_down.n
     args.state.battle_state = false
   end
+
+  x = 460
+
+  args.outputs.labels << small_label(args, x, 15, "Click inside the blue box maybe ---->")
+
+  box = { x: 785, y: 370, w: 50, h: 50, r: 0, g: 0, b: 170 }
+  args.outputs.borders << box
+
+  # Saves the most recent click into args.state
+  # Unlike the other components of args,
+  # args.state does not reset every tick.
+  if args.inputs.mouse.click
+    args.state.last_mouse_click = args.inputs.mouse.click
+  end
+
+  if args.state.last_mouse_click
+    if args.state.last_mouse_click.point.inside_rect? box
+      args.outputs.labels << small_label(args, x, 16, "Mouse click happened *inside* the box.")
+    else
+      args.outputs.labels << small_label(args, x, 16, "Mouse click happened *outside* the box.")
+    end
+  else
+    args.outputs.labels << small_label(args, x, 16, "Mouse click has not occurred yet.")
+  end
+
  # args.outputs.labels  << [640, 540, args.state.ando.name, 5, 1]
  # args.outputs.labels  << [640, 500, "hp: #{args.state.ando.hp}", 5, 1]
   
