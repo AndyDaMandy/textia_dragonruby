@@ -1,25 +1,6 @@
-#shows character status
-class Character
-  attr_accessor :name, :level, :hp, :chp, :mp, :cmp, :pAtk, :pDef, :mAtk, :mDef, :luck, :exp, :buff, :skills, :support, :weapon, :type
-  def initialize(name, level, hp, chp, mp, cmp, pAtk, pDef, mAtk, mDef, luck, exp, buff, skills, support, weapon, type)
-    @name = name
-    @level = level
-    @hp = hp
-    @chp = chp
-    @mp = mp
-    @pAtk = pAtk
-    @pdef = pDef
-    @mAtk = mAtk
-    @mDef = mDef
-    @luck = luck
-    @exp = exp
-    @buff = buff
-    @skills = skills
-    @support = support
-    @weapon = weapon
-    @type = type
-  end
-end
+require 'mygame/app/data/characters.rb'
+require 'mygame/app/data/character_skills.rb'
+require 'mygame/app/data/monsters.rb'
 
 def show_status(args, char, slot)
   if slot == 1
@@ -114,7 +95,7 @@ def tick_instructions args, text, y = 715
 end
 
 
-#game
+# game
 def tick args
   game = [
     #one
@@ -132,26 +113,8 @@ def tick args
   ]
   #chars states
   #args.state.ando ||= Character.new("Ando", 1, 15, 15, 5, 5, 10, 4, 1, 2, 1, 0, [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}], [], [], "Sword", "Player")
-
-  args.state.ando ||= {
-    name: 'Ando',
-    level: 1,
-    hp: 15,
-    chp: 15,
-    mp: 5,
-    cmp: 5,
-    pAtk: 10,
-    pDef: 4,
-    mAtk: 1,
-    mDef: 2,
-    luck: 1,
-    exp: 0,
-    #buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
-    skills: [],
-    support: [],
-    weapon: 'Text',
-    type: 'Player'
-  }
+  ando = ando
+  args.state.ando ||= ando
   args.state.marie ||= {
     name: 'Marie',
     level: 1,
