@@ -1,139 +1,54 @@
-require 'mygame/app/data/characters.rb'
-require 'mygame/app/data/character_skills.rb'
-require 'mygame/app/data/monsters.rb'
+require '/app/data/characters.rb'
+require '/app/data/skills.rb'
+require '/app/data/enemies.rb'
+require '/app/data/game_world.rb'
+require '/app/data/items.rb'
+require '/app/data/skills.rb'
+require '/app/data/elements.rb'
 
-def show_status(args, char, slot)
-  if slot == 1
-    x = 200   
-  elsif slot == 2
-    x = 400
-  elsif slot == 3
-    x = 600
-  end
-  y = 540
-  args.outputs.labels  << [x, y, char.name, 5, 1]
-  args.outputs.labels  << [x, y - 30, "Lvl: #{char.level}", 5, 1]
-  args.outputs.labels  << [x, y - 60, "HP: #{char.hp}", 5, 1]
-  args.outputs.labels  << [x, y - 90, "MP: #{char.mp}", 5, 1]
-  args.outputs.labels  << [x, y - 120, "pAtk: #{char.pAtk}", 5, 1]
-  args.outputs.labels  << [x, y - 150, "pdef: #{char.pDef}", 5, 1]
-  args.outputs.labels  << [x, y - 180, "mAtk: #{char.mAtk}", 5, 1]
-  args.outputs.labels  << [x, y - 210, "mDef: #{char.mDef}", 5, 1]
-  args.outputs.labels  << [x, y - 240, "Luck: #{char.luck}", 5, 1]
-  args.outputs.labels  << [x, y - 270, "exp: #{char.exp}", 5, 1]
-end
-#levels up a character
-def level_up(char)
-  char.level += 1
-  char.hp += 1
-  char.chp += 1
-  char.mp += 1
-  char.cmp += 1
-  char.pAtk += 1
-  char.pDef += 1
-  char.mAtk += 1
-  char.mDef += 1
-  char.luck += 1
-  char.exp += 1
-end
-#this moves through the mains screen and renders battle buttons
-def main_screen(args, state)
-  x = 500
-  y = 540
-  if state == 0
-    args.outputs.labels << [x, y, 'Amaryllis Town\n
-      Shaman: "Hello Ando and Marie, today is the day of your pilgrimage."\n
-      Our town needs a new crystal and you both are going to the Crystal Lake to gather one for us
-      Without it we cannot protect ourselves from monsters much longer.\n
-      To access the menu, click the "Menu" button above. You can check your items, party, skills, etc.\n
-      "If you click the tutorial button you can learn a lot about how to survive. Dont go into the wilderness unprepared! You can access it at any time, so if youre ever confused you can open it again."\n
-      "If youd like to move on, click below, or click the shop button above"', 5, 1]
-  elsif state == 1
-    args.outputs.labels << [x, y, "testing this!", 5, 1]
-  end
-end
-def battle(args, state)
-end
+def init_args(args)
+  include Elements
+  include Game_Script
 
-def output_world(args, string)
-
-  args.outputs.labels << string.map_with_index do |s, i|
-    line_height = 25
-    {
-      x: 60,
-      y: 60.from_top - (i * line_height),
-      text: s
-    }
-  end
-end
-def battle_screen(args)
-  x = 500
-  y = 540
-  args.outputs.labels << [x, y, "Battle!", 5, 1]
-end
-
-def small_label args, x, row, message
-  { x: x, y: row_to_px(args, row), text: message, size_enum: -2 }
-end
-
-def row_to_px args, row_number
-  args.grid.top.shift_down(5).shift_down(20 * row_number)
-end
-
-def tick_instructions args, text, y = 715
-  return if args.state.key_event_occurred
-  if args.inputs.mouse.click ||
-     args.inputs.keyboard.directional_vector ||
-     args.inputs.keyboard.key_down.enter ||
-     args.inputs.keyboard.key_down.escape
-    args.state.key_event_occurred = true
-  end
-
-  args.outputs.debug << { x: 0,   y: y - 50, w: 1280, h: 60 }.solid!
-  args.outputs.debug << { x: 640, y: y, text: text, size_enum: 1, alignment_enum: 1, r: 255, g: 255, b: 255 }.label!
-  args.outputs.debug << { x: 640, y: y - 25, text: "(click to dismiss instructions)", size_enum: -2, alignment_enum: 1, r: 255, g: 255, b: 255 }.label!
-end
-
-
-# game
-def tick args
-  game = [
-    #one
-    'Amaryllis Town
-    Shaman: "Hello Ando and Marie, today is the day of your pilgrimage."
-    Our town needs a new crystal and you both are going to the Crystal Lake to gather one for us
-    Without it we cannot protect ourselves from monsters much longer.
-    To access the menu, click the "Menu" button above. You can check your items, party, skills, etc.
-    "If you click the tutorial button you can learn a lot about how to survive. Dont go into the wilderness unprepared! You can access it at any time, so if youre ever confused you can open it again."
-    "If youd like to move on, click below, or click the shop button above"',
-    #two
-    "The Forest
-          You've found yourself in a mysterious forest. It's full of danger at every turn.
-          You're worried the danger might be too high, maybe you should head back to town?"
-  ]
-  #chars states
-  #args.state.ando ||= Character.new("Ando", 1, 15, 15, 5, 5, 10, 4, 1, 2, 1, 0, [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}], [], [], "Sword", "Player")
-  ando = ando
-  args.state.ando ||= ando
-  args.state.marie ||= {
-    name: 'Marie',
+  args.state.screen ||= 0
+  args.state.ando ||= {
+    name: 'Ando',
     level: 1,
-    hp: 10,
-    chp: 10,
-    mp: 13,
-    cmp: 13,
-    pAtk: 3,
-    pDef: 2,
-    mAtk: 10,
-    mDef: 5,
-    luck: 3,
+    hp: 15,
+    chp: 15,
+    mp: 5,
+    cmp: 5,
+    p_atk: 10,
+    p_def: 4,
+    m_atk: 1,
+    m_def: 2,
+    luck: 1,
     exp: 0,
-    ##buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
+    buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
     skills: [],
     support: [],
     weapon: 'Text',
     type: 'Player'
   }
+  args.state.marie ||= {
+      name: 'Marie',
+      level: 1,
+      hp: 10,
+      chp: 10,
+      mp: 13,
+      cmp: 13,
+      p_atk: 3,
+      p_def: 2,
+      m_atk: 10,
+      m_def: 5,
+      luck: 3,
+      exp: 0,
+      buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
+      skills: [],
+      support: [],
+      weapon: 'Text',
+      type: 'Player'
+    }
   args.state.julie ||= {
     name: 'Julie',
     level: 3,
@@ -141,13 +56,13 @@ def tick args
     chp: 14,
     mp: 8,
     cmp: 8,
-    pAtk: 12,
-    pDef: 5,
-    mAtk: 3,
-    mDef: 6,
+    p_atk: 12,
+    p_def: 5,
+    m_atk: 3,
+    m_def: 6,
     luck: 5,
     exp: 30,
-    #buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
+    buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
     skills: [],
     support: [],
     weapon: 'Text',
@@ -160,107 +75,146 @@ def tick args
     chp: 14,
     mp: 6,
     cmp: 6,
-    pAtk: 12,
-    pDef: 8,
-    mAtk: 3,
-    mDef: 9,
+    p_atk: 12,
+    p_def: 8,
+    m_atk: 3,
+    m_def: 9,
     luck: 8,
     exp: 50,
-    #buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
+    buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
     skills: [],
     support: [],
     weapon: 'Text',
     type: 'Player'
   }
-  #enemies states
-
-  #gamestate
-  args.state.game_state ||= 0
-  args.state.really_long_string ||= game[args.state.game_state]
-  args.state.battle_state ||= false
-
-  #args.state.screen ||= 0
-  #main_screen(args, args.state.screen)
-  #show_status(args, args.state.ando, 1)
-  #show_status(args, args.state.marie, 2)
-  #show_status(args, args.state.julie, 3)
-  # create a really long string
-=begin
-  args.state.really_long_string =  {
-    one: 'Amaryllis Town
-        Shaman: "Hello Ando and Marie, today is the day of your pilgrimage."
-        Our town needs a new crystal and you both are going to the Crystal Lake to gather one for us
-        Without it we cannot protect ourselves from monsters much longer.
-        To access the menu, click the "Menu" button above. You can check your items, party, skills, etc.
-        "If you click the tutorial button you can learn a lot about how to survive. Dont go into the wilderness unprepared! You can access it at any time, so if youre ever confused you can open it again."
-        "If youd like to move on, click below, or click the shop button above"',
-    two: "The Forest
-        You've found yourself in a mysterious forest. It's full of danger at every turn.
-        You're worried the danger might be too high, maybe you should head back to town?"
+  args.state.gabriel ||= {
+    name: 'Gabriel',
+    level: 10,
+    hp: 17,
+    chp: 17,
+    mp: 24,
+    cmp: 24,
+    p_atk: 12,
+    p_def: 17,
+    m_atk: 19,
+    m_def: 20,
+    luck: 12,
+    exp: 650,
+    buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
+    skills: [],
+    support: [],
+    weapon: 'Text',
+    type: 'Player'
   }
-=end
-#linebreak variables
-# length of characters on line
-  max_character_length = 80
-# line height
-  #line_height = 25
-  long_string = args.state.really_long_string
+  wood_sword = {
+    name: "Wooden Sword",
+    category: "Weapon",
+    type: "Sword",
+    des: "A basic wooden sword",
+    atr: "Physical",
+    element: Elements::NEUTRAL,
+    pow: 1
+  }
+  wood_staff = {
+    name: "Wooden Staff",
+    category: "Weapon",
+    type: "Staff",
+    des: "A basic Staff",
+    atr: "Magical",
+    element: Elements::NEUTRAL,
+    pow: 1
+  }
 
-  # API: args.string.wrapped_lines string, max_character_length
-  long_strings_split = args.string.wrapped_lines long_string, max_character_length
+  puts wood_sword
+end
 
-  #checks if in battle mode or not
-  if (args.state.battle_state == false)
-    output_world(args, long_strings_split)
+def game(args)
+  case args.state.screen
+  when 1
+    args.outputs.labels << [640, 540, Game_Script::SCRIPT[:one][:scene], 5, 1]
+    # we could create buttons here... this will allow us to pick where we go
+    # We set buttons here as well.
+    button_creator("Forward", 2, 2, args)
+    button_creator("Backward", 0, 1, args)
   else
-    battle_screen(args)
+    args.outputs.labels << [640, 540, 'Testing!', 5, 1]
+    button_creator("Forward", 2, 2, args)
+    button_creator("Backward", 0, 1, args)
   end
+end
 
-
-  #gameflow is as follows gamestate is equal to a number
-  #Next I need buttons to control game flow
-  #importantly, I need a way to make sure that the button matches the correct location, similarly to the original textia
-
-  if args.inputs.keyboard.key_down.z
-    level_up(args.state.ando)
-  end
-
-  if args.inputs.keyboard.key_down.j
-    args.state.game_state += 1
-    args.state.really_long_string  = game[args.state.game_state]
-  end
-  if args.inputs.keyboard.key_down.m
-    args.state.battle_state = true
-  end
-  if args.inputs.keyboard.key_down.n
-    args.state.battle_state = false
-  end
-
-  x = 460
-
-  args.outputs.labels << small_label(args, x, 15, "Click inside the blue box maybe ---->")
-
-  box = { x: 785, y: 370, w: 50, h: 50, r: 0, g: 0, b: 170 }
-  args.outputs.borders << box
-
-  # Saves the most recent click into args.state
-  # Unlike the other components of args,
-  # args.state does not reset every tick.
-  if args.inputs.mouse.click
-    args.state.last_mouse_click = args.inputs.mouse.click
-  end
-
-  if args.state.last_mouse_click
-    if args.state.last_mouse_click.point.inside_rect? box
-      args.outputs.labels << small_label(args, x, 16, "Mouse click happened *inside* the box.")
-    else
-      args.outputs.labels << small_label(args, x, 16, "Mouse click happened *outside* the box.")
-    end
+def game_state(args)
+  case args.state.screen
+  when 0
+    main_menu(args)
   else
-    args.outputs.labels << small_label(args, x, 16, "Mouse click has not occurred yet.")
+    game(args)
+  end
+end
+
+def main_menu(args)
+  args.outputs.labels << [640, 540, 'Textia Dragonruby!', 5, 1]
+  args.outputs.borders << [450, 410, 120, 50]
+  args.outputs.labels << [500, 450, "Forward", 4, 1]
+  args.outputs.borders << [100, 100, 1000, 80]
+  button_creator("Start Game", 1, 2, args)
+end
+
+def button_creator(text, state, position, args)
+  case position
+  when 0
+    x = 10
+    y = 10
+  when 1
+    x = 80
+    y = 80
+  when 2
+    x = 150
+    y = 150
+  else
+    # type code here
+    x = 100
+    y = 100
+  end
+  label = {
+    x:                       x,
+    y:                       y,
+    text:                    text,
+    size_enum:               2,
+    alignment_enum:          1, # 0 = left, 1 = center, 2 = right
+    r:                       155,
+    g:                       50,
+    b:                       50,
+    a:                       255,
+    # font:                    "fonts/manaspc.ttf",
+    vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
+  }
+  border = {
+    x: x,
+    y: y,
+    w: 100,
+    h: 50,
+    r: 255,
+    g: 255,
+    b: 255,
+    a: 255,
+    vertical_alignment_enum: 0
+  }
+  args.outputs.labels << label
+  args.outputs.borders << border
+
+  if (args.inputs.mouse.click) &&
+    (args.inputs.mouse.point.inside_rect? border)
+    args.gtk.notify! "button was clicked"
+    args.state.screen = state
   end
 
- # args.outputs.labels  << [640, 540, args.state.ando.name, 5, 1]
- # args.outputs.labels  << [640, 500, "hp: #{args.state.ando.hp}", 5, 1]
-  
+end
+
+def tick(args)
+  init_args(args)
+  game_state(args)
+  args.outputs.labels << [100, 100, "#{args.state.screen}", 5, 1]
+
+
 end
