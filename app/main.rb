@@ -125,15 +125,32 @@ def init_args(args)
     pow: 1
   }
 
-  puts wood_sword
+end
+
+def split_script(scene, args)
+  split_script = scene.split("\n")
+  split_script.each_with_index do |line, i|
+    args.outputs.labels << [640, 540 - (i * 20), line, 1, 1]
+  end
+end
+def iterate_buttons(buttons, args)
+  position = 0
+  buttons.each do |button|
+    button_creator(button[:text], button[:state], position, args)
+    position += 1
+  end
 end
 
 def game(args)
   case args.state.screen
   when 1
-    args.outputs.labels << [640, 540, Game_Script::SCRIPT[:one][:scene], 5, 1]
-    # we could create buttons here... this will allow us to pick where we go
-    # We set buttons here as well.
+    split_script(Game_Script::SCRIPT[1][:scene], args)
+    iterate_buttons(Game_Script::SCRIPT[1][:buttons], args)
+  when 2
+    split_script(Game_Script::SCRIPT[2][:scene], args)
+    iterate_buttons(Game_Script::SCRIPT[2][:buttons], args)
+  when 3
+    args.outputs.labels << [640, 540, Game_Script::SCRIPT[3], 5, 1]
     button_creator("Forward", 2, 2, args)
     button_creator("Backward", 0, 1, args)
   else
@@ -154,23 +171,23 @@ end
 
 def main_menu(args)
   args.outputs.labels << [640, 540, 'Textia Dragonruby!', 5, 1]
-  args.outputs.borders << [450, 410, 120, 50]
-  args.outputs.labels << [500, 450, "Forward", 4, 1]
-  args.outputs.borders << [100, 100, 1000, 80]
-  button_creator("Start Game", 1, 2, args)
+  button_creator("Start Game", 1, "start", args)
 end
 
 def button_creator(text, state, position, args)
   case position
   when 0
-    x = 10
-    y = 10
+    x = 80
+    y = 30
   when 1
     x = 80
     y = 80
   when 2
     x = 150
     y = 150
+  when "start"
+    x = 600
+    y = 400
   else
     # type code here
     x = 100
