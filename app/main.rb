@@ -130,9 +130,14 @@ end
 def split_script(scene, args)
   split_script = scene.split("\n")
   split_script.each_with_index do |line, i|
-    args.outputs.labels << [640, 540 - (i * 20), line, 1, 1]
+    if args.state.dark_mode == false
+      args.outputs.labels << [640, 540 - (i * 20), line, 1, 1, 0, 0, 0]
+    else
+      args.outputs.labels << [640, 540 - (i * 20), line, 1, 1, 255, 255, 255]
+    end
   end
 end
+
 def iterate_buttons(buttons, args)
   position = 0
   buttons.each do |button|
@@ -170,8 +175,75 @@ def game_state(args)
 end
 
 def main_menu(args)
-  args.outputs.labels << [640, 540, 'Textia Dragonruby!', 5, 1]
+  # args.state.dark_mode ||= true
+  # theme(args)
+  x = 840
+  y = 540
+  if args.state.dark_mode == false
+  args.outputs.labels << [640, 540, 'Textia Dragonruby!', 5, 1, 0, 0, 0]
+  main_label = {
+    x:                       x,
+    y:                       y,
+    text:                    "Dark Mode",
+    size_enum:               2,
+    alignment_enum:          1, # 0 = left, 1 = center, 2 = right
+    r:                       0,
+    g:                       0,
+    b:                       0,
+    a:                       255,
+    # font:                    "fonts/manaspc.ttf",
+    vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
+  }
+  main_border = {
+    x: x,
+    y: y,
+    w: 100,
+    h: 50,
+    r: 0,
+    g: 0,
+    b: 0,
+    a: 255,
+    vertical_alignment_enum: 0
+  }
+  else
+    args.outputs.labels << [640, 540, 'Textia Dragonruby!', 5, 1, 255, 255, 255]
+    main_label = {
+      x:                       x,
+      y:                       y,
+      text:                    "Light Mode",
+      size_enum:               2,
+      alignment_enum:          1, # 0 = left, 1 = center, 2 = right
+      r:                       255,
+      g:                       255,
+      b:                       255,
+      a:                       255,
+      # font:                    "fonts/manaspc.ttf",
+      vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
+    }
+    main_border = {
+      x: x,
+      y: y,
+      w: 100,
+      h: 50,
+      r: 255,
+      g: 255,
+      b: 255,
+      a: 255,
+      vertical_alignment_enum: 0
+    }
+
+  end
   button_creator("Start Game", 1, "start", args)
+
+  args.outputs.labels << main_label
+  args.outputs.borders << main_border
+
+  if (args.inputs.mouse.click) &&
+    (args.inputs.mouse.point.inside_rect? main_border)
+    args.gtk.notify! "button was clicked"
+    args.state.dark_mode = !args.state.dark_mode
+    puts args.state.dark_mode
+  end
 end
 
 def button_creator(text, state, position, args)
@@ -193,30 +265,57 @@ def button_creator(text, state, position, args)
     x = 100
     y = 100
   end
-  label = {
-    x:                       x,
-    y:                       y,
-    text:                    text,
-    size_enum:               2,
-    alignment_enum:          1, # 0 = left, 1 = center, 2 = right
-    r:                       155,
-    g:                       50,
-    b:                       50,
-    a:                       255,
-    # font:                    "fonts/manaspc.ttf",
-    vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
-  }
-  border = {
-    x: x,
-    y: y,
-    w: 100,
-    h: 50,
-    r: 255,
-    g: 255,
-    b: 255,
-    a: 255,
-    vertical_alignment_enum: 0
-  }
+  if args.state.dark_mode == false
+    label = {
+      x:                       x,
+      y:                       y,
+      text:                    text,
+      size_enum:               2,
+      alignment_enum:          1, # 0 = left, 1 = center, 2 = right
+      r:                       0,
+      g:                       0,
+      b:                       0,
+      a:                       255,
+      # font:                    "fonts/manaspc.ttf",
+      vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
+    }
+    border = {
+      x: x,
+      y: y,
+      w: 100,
+      h: 50,
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 255,
+      vertical_alignment_enum: 0
+    }
+  else
+    label = {
+      x:                       x,
+      y:                       y,
+      text:                    text,
+      size_enum:               2,
+      alignment_enum:          1, # 0 = left, 1 = center, 2 = right
+      r:                       255,
+      g:                       255,
+      b:                       255,
+      a:                       255,
+      # font:                    "fonts/manaspc.ttf",
+      vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
+    }
+    border = {
+      x: x,
+      y: y,
+      w: 100,
+      h: 50,
+      r: 255,
+      g: 255,
+      b: 255,
+      a: 255,
+      vertical_alignment_enum: 0
+    }
+  end
   args.outputs.labels << label
   args.outputs.borders << border
 
@@ -228,10 +327,22 @@ def button_creator(text, state, position, args)
 
 end
 
+def theme(args)
+  if args.state.dark_mode == false
+    args.outputs.solids << [0, 0, 1280, 720, 255, 255, 255]
+    args.outputs.labels << [100, 100, "#{args.state.screen}", 5, 1, 0, 0, 0]
+  else
+    args.outputs.solids << [0, 0, 1280, 720, 0, 0, 0]
+    args.outputs.labels << [100, 100, "#{args.state.screen}", 5, 1, 255, 255, 255]
+  end
+  puts args.state.dark_mode
+end
+
 def tick(args)
+  args.state.dark_mode ||= false
+  theme(args)
   init_args(args)
   game_state(args)
-  args.outputs.labels << [100, 100, "#{args.state.screen}", 5, 1]
 
 
 end
