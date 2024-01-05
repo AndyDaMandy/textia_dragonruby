@@ -169,9 +169,15 @@ def game_state(args)
   case args.state.screen
   when 0
     main_menu(args)
+  when 10000
+    battle(enemies, new_state, args)
   else
     game(args)
   end
+end
+
+def battle(enemies, new_state, args)
+
 end
 
 def main_menu(args)
@@ -342,6 +348,7 @@ def tick(args)
   args.state.dark_mode ||= false
   theme(args)
   init_args(args)
+  init_enemies(args)
   game_state(args)
 
 
