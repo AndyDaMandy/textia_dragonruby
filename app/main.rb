@@ -12,28 +12,32 @@ def init_args(args)
   include Elements
   include Enemies
   include Game_Script
-  args.state.screen ||= 0
-  args.state.post_battle_screen ||= 0
-  args.state.ando ||= {
-    name: 'Ando',
-    level: 1,
-    hp: 15,
-    chp: 15,
-    mp: 5,
-    cmp: 5,
-    p_atk: 10,
-    p_def: 4,
-    m_atk: 1,
-    m_def: 2,
-    luck: 1,
-    exp: 0,
-    buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
-    skills: [],
-    support: [],
-    weapon: 'Text',
-    type: 'Player'
-  }
-  args.state.marie ||= {
+  # initial setup
+  if args.state.tick_count == 0
+    args.state.dark_mode = false
+    args.state.enemy_party ||= []
+    args.state.screen ||= 0
+    args.state.post_battle_screen ||= 0
+    args.state.ando ||= {
+      name: 'Ando',
+      level: 1,
+      hp: 15,
+      chp: 15,
+      mp: 5,
+      cmp: 5,
+      p_atk: 10,
+      p_def: 4,
+      m_atk: 1,
+      m_def: 2,
+      luck: 1,
+      exp: 0,
+      buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
+      skills: [],
+      support: [],
+      weapon: 'Text',
+      type: 'Player'
+    }
+    args.state.marie ||= {
       name: 'Marie',
       level: 1,
       hp: 10,
@@ -52,70 +56,82 @@ def init_args(args)
       weapon: 'Text',
       type: 'Player'
     }
-  args.state.julie ||= {
-    name: 'Julie',
-    level: 3,
-    hp: 14,
-    chp: 14,
-    mp: 8,
-    cmp: 8,
-    p_atk: 12,
-    p_def: 5,
-    m_atk: 3,
-    m_def: 6,
-    luck: 5,
-    exp: 30,
-    buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
-    skills: [],
-    support: [],
-    weapon: 'Text',
-    type: 'Player'
-  }
-  args.state.ari ||= {
-    name: 'Ari',
-    level: 5,
-    hp: 14,
-    chp: 14,
-    mp: 6,
-    cmp: 6,
-    p_atk: 12,
-    p_def: 8,
-    m_atk: 3,
-    m_def: 9,
-    luck: 8,
-    exp: 50,
-    buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
-    skills: [],
-    support: [],
-    weapon: 'Text',
-    type: 'Player'
-  }
-  args.state.gabriel ||= {
-    name: 'Gabriel',
-    level: 10,
-    hp: 17,
-    chp: 17,
-    mp: 24,
-    cmp: 24,
-    p_atk: 12,
-    p_def: 17,
-    m_atk: 19,
-    m_def: 20,
-    luck: 12,
-    exp: 650,
-    buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
-    skills: [],
-    support: [],
-    weapon: 'Text',
-    type: 'Player'
-  }
+    args.state.julie ||= {
+      name: 'Julie',
+      level: 3,
+      hp: 14,
+      chp: 14,
+      mp: 8,
+      cmp: 8,
+      p_atk: 12,
+      p_def: 5,
+      m_atk: 3,
+      m_def: 6,
+      luck: 5,
+      exp: 30,
+      buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
+      skills: [],
+      support: [],
+      weapon: 'Text',
+      type: 'Player'
+    }
+    args.state.ari ||= {
+      name: 'Ari',
+      level: 5,
+      hp: 14,
+      chp: 14,
+      mp: 6,
+      cmp: 6,
+      p_atk: 12,
+      p_def: 8,
+      m_atk: 3,
+      m_def: 9,
+      luck: 8,
+      exp: 50,
+      buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
+      skills: [],
+      support: [],
+      weapon: 'Text',
+      type: 'Player'
+    }
+    args.state.gabriel ||= {
+      name: 'Gabriel',
+      level: 10,
+      hp: 17,
+      chp: 17,
+      mp: 24,
+      cmp: 24,
+      p_atk: 12,
+      p_def: 17,
+      m_atk: 19,
+      m_def: 20,
+      luck: 12,
+      exp: 650,
+      buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
+      skills: [],
+      support: [],
+      weapon: 'Text',
+      type: 'Player'
+    }
+    # rest of my setup/default state
+  end
+  # loads theme
+  theme(args)
+
+end
+
+def script_and_buttons_load(scene, args)
+  # loads the title, script, and buttons
+  load_title(scene[:title], args)
+  split_script(scene[:scene], args)
+  iterate_buttons(scene[:buttons], args)
 end
 
 def load_title(scene, args)
   if args.state.dark_mode == false
-    args.outputs.labels << [640, 570, scene, 5, 1, 0, 0, 0]
+    args.outputs.labels << [640, 600, scene, 5, 1, 0, 0, 0]
   else
-    args.outputs.labels << [640, 570, scene, 5, 1, 255, 255, 255]
+    args.outputs.labels << [640, 600, scene, 5, 1, 255, 255, 255]
   end
 end
 
@@ -123,9 +139,9 @@ def split_script(scene, args)
   split_script = scene.split("\n")
   split_script.each_with_index do |line, i|
     if args.state.dark_mode == false
-      args.outputs.labels << [640, 540 - (i * 20), line, 1, 1, 0, 0, 0]
+      args.outputs.labels << [640, 540 - (i * 20), line.strip, 1, 1, 0, 0, 0]
     else
-      args.outputs.labels << [640, 540 - (i * 20), line, 1, 1, 255, 255, 255]
+      args.outputs.labels << [640, 540 - (i * 20), line.strip, 1, 1, 255, 255, 255]
     end
   end
 end
@@ -149,21 +165,14 @@ end
 def game(args)
   case args.state.screen
   when 1
-    load_title(Game_Script::SCRIPT[1][:title], args)
-    split_script(Game_Script::SCRIPT[1][:scene], args)
-    iterate_buttons(Game_Script::SCRIPT[1][:buttons], args)
+    script_and_buttons_load(SCRIPT[1], args)
   when 2
-    load_title(Game_Script::SCRIPT[2][:title], args)
-    split_script(Game_Script::SCRIPT[2][:scene], args)
-    iterate_buttons(Game_Script::SCRIPT[2][:buttons], args)
+    script_and_buttons_load(SCRIPT[2], args)
   when 3
-    load_title(Game_Script::SCRIPT[3][:title], args)
-    split_script(Game_Script::SCRIPT[3][:scene], args)
-    iterate_buttons(Game_Script::SCRIPT[3][:buttons], args)
+    script_and_buttons_load(SCRIPT[3], args)
   else
-    args.outputs.labels << [640, 540, 'Testing!', 5, 1]
-    button_creator("Forward", 2, 2, args)
-    button_creator("Backward", 0, 1, args)
+    args.outputs.labels << [640, 540, 'Something went wrong!', 5, 1]
+    button_creator("Main Menu", 0, 2, args)
   end
 end
 
@@ -188,6 +197,7 @@ def battle(enemies, args)
 end
 
 def main_menu(args)
+  # displays dark mode toggle on start
   dark_mode_button(args)
   if args.state.dark_mode == false
     args.outputs.labels << [640, 540, 'Textia Dragonruby!', 5, 1, 0, 0, 0]
@@ -195,6 +205,7 @@ def main_menu(args)
     args.outputs.labels << [640, 540, 'Textia Dragonruby!', 5, 1, 255, 255, 255]
   end
   button_creator("Start Game", 1, "start", args)
+  # load save is the next button
 end
 
 def dark_mode_button(args)
@@ -258,7 +269,6 @@ def dark_mode_button(args)
     (args.inputs.mouse.point.inside_rect? dark_mode_border)
     args.gtk.notify! "button was clicked"
     args.state.dark_mode = !args.state.dark_mode
-    puts args.state.dark_mode
   end
 end
 
@@ -351,13 +361,9 @@ def theme(args)
     args.outputs.solids << [0, 0, 1280, 720, 0, 0, 0]
     args.outputs.labels << [1200, 100, "#{args.state.screen}", 5, 1, 255, 255, 255]
   end
-  puts args.state.dark_mode
 end
 
 def tick(args)
-  args.state.dark_mode ||= false
-  theme(args)
-  args.state.enemy_party ||= []
   init_args(args)
   game_state(args)
 end
