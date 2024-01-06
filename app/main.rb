@@ -217,7 +217,7 @@ def dark_mode_button(args)
     dark_mode_border = {
       x: x - 70,
       y: y,
-      w: 100,
+      w: 150,
       h: 50,
       r: 0,
       g: 0,
@@ -355,10 +355,9 @@ def theme(args)
 end
 
 def tick(args)
-  args.state.dark_mode ||= true
+  args.state.dark_mode ||= false
   theme(args)
   args.state.enemy_party ||= []
   init_args(args)
   game_state(args)
-
 end
