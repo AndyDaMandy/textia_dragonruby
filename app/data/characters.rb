@@ -1,1 +1,3 @@
+class Characters
 
+end

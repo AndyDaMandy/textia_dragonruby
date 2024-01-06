@@ -1,3 +1,4 @@
+require '/app/data/button_module.rb'
 require '/app/data/elements.rb'
 require '/app/data/skills.rb'
 require '/app/data/enemies.rb'
@@ -12,11 +13,13 @@ def init_args(args)
   include Elements
   include Enemies
   include Game_Script
+  include Button_types
   # initial setup
   if args.state.tick_count == 0
-    args.state.dark_mode = false
+    args.state.dark_mode = true
     args.state.enemy_party ||= []
     args.state.screen ||= 0
+    args.state.location ||= 1
     args.state.post_battle_screen ||= 0
     args.state.ando ||= {
       name: 'Ando',
@@ -150,20 +153,20 @@ def iterate_buttons(buttons, args)
   position = 0
   buttons.each do |button|
     if button[:type] == BATTLE
-      button_creator(button[:text], 10000, position, args)
+      button_creator(button[:text], BATTLE, 1, position, args)
       # activates battle screen and launches battle
       args.state.post_battle_screen = button[:state]
       args.state.enemy_party = button[:effect]
       position += 1
       next
     end
-    button_creator(button[:text], button[:state], position, args)
+    button_creator(button[:text], SCENE, button[:state], position, args)
     position += 1
   end
 end
 
 def game(args)
-  case args.state.screen
+  case args.state.location
   when 1
     script_and_buttons_load(SCRIPT[1], args)
   when 2
@@ -172,7 +175,7 @@ def game(args)
     script_and_buttons_load(SCRIPT[3], args)
   else
     args.outputs.labels << [640, 540, 'Something went wrong!', 5, 1]
-    button_creator("Main Menu", 0, 2, args)
+    button_creator("Main Menu", SCREEN, 2, 2, args)
   end
 end
 
@@ -180,10 +183,15 @@ def game_state(args)
   case args.state.screen
   when 0
     main_menu(args)
-  when 10000
+  when 1
     battle_screen(args)
-  else
+  when 2
     game(args)
+  when 3
+    #game menu
+  else
+    args.outputs.labels << [640, 540, 'Something went wrong!', 5, 1]
+    button_creator("Main Menu", SCREEN, 2, 2, args)
   end
 end
 
@@ -204,7 +212,7 @@ def main_menu(args)
   else
     args.outputs.labels << [640, 540, 'Textia Dragonruby!', 5, 1, 255, 255, 255]
   end
-  button_creator("Start Game", 1, "start", args)
+  button_creator("Start Game", SCREEN,2, "start", args)
   # load save is the next button
 end
 
@@ -272,7 +280,7 @@ def dark_mode_button(args)
   end
 end
 
-def button_creator(text, state, position, args)
+def button_creator(text, type, state, position, args)
   case position
   when 0
     x = 100
@@ -287,7 +295,6 @@ def button_creator(text, state, position, args)
     x = 600
     y = 400
   else
-    # type code here
     x = 800
     y = 50
   end
@@ -345,11 +352,35 @@ def button_creator(text, state, position, args)
   args.outputs.labels << label
   args.outputs.borders << border
 
-  if (args.inputs.mouse.click) &&
-    (args.inputs.mouse.point.inside_rect? border)
-    args.gtk.notify! "button was clicked"
-    args.state.screen = state
+  case type
+  when SCREEN
+    if (args.inputs.mouse.click) &&
+      (args.inputs.mouse.point.inside_rect? border)
+      args.gtk.notify! "button was clicked"
+      args.state.screen = 2
+    end
+  when BATTLE
+    if (args.inputs.mouse.click) &&
+      (args.inputs.mouse.point.inside_rect? border)
+      args.gtk.notify! "button was clicked"
+      args.state.screen = 1
+    end
+  when SCENE
+    if (args.inputs.mouse.click) &&
+      (args.inputs.mouse.point.inside_rect? border)
+      args.gtk.notify! "button was clicked"
+      args.state.location = state
+      args.state.screen = 2
+    end
+  else
+    args.outputs.labels << [640, 540, 'Something went wrong!!', 5, 1, 255, 255, 255]
+    # button_creator("Start Game", SCREEN,1, "start", args)
   end
+  # if (args.inputs.mouse.click) &&
+  #   (args.inputs.mouse.point.inside_rect? border)
+  #   args.gtk.notify! "button was clicked"
+  #   args.state.screen = state
+  # end
 
 end
 
