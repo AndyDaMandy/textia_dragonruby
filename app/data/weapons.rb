@@ -21,3 +21,27 @@ module Weapon_types
   }
 end
 
+module Weapons
+  include Elements
+  include Weapon_types
+  include Item_types
+  include Attributes
+  WOOD_SWORD = {
+    name: "Wooden Sword",
+    category: WEAPON,
+    type: SWORD,
+    des: "A basic wooden sword",
+    atr: PHYSICAL,
+    element: NEUTRAL,
+    pow: 1
+  }
+  WOOD_STAFF = {
+    name: "Wooden Staff",
+    category: WEAPON,
+    type: STAFF,
+    des: "A basic Staff",
+    atr: MAGICAL,
+    element: NEUTRAL,
+    pow: 1
+  }
+end

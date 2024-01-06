@@ -20,3 +20,14 @@ module Elements
     des: 'non-elemental damage'
   }
 end
+
+module Attributes
+  PHYSICAL = {
+    atr: 'Physical',
+    des: 'Physical damage'
+  }
+  MAGICAL = {
+    atr: 'Magical',
+    des: 'Magical damage'
+  }
+end

@@ -10,8 +10,8 @@ require '/app/data/skills.rb'
 
 def init_args(args)
   include Elements
+  include Enemies
   include Game_Script
-
   args.state.screen ||= 0
   args.state.post_battle_screen ||= 0
   args.state.ando ||= {
@@ -109,25 +109,6 @@ def init_args(args)
     weapon: 'Text',
     type: 'Player'
   }
-  wood_sword = {
-    name: "Wooden Sword",
-    category: "Weapon",
-    type: "Sword",
-    des: "A basic wooden sword",
-    atr: "Physical",
-    element: Elements::NEUTRAL,
-    pow: 1
-  }
-  wood_staff = {
-    name: "Wooden Staff",
-    category: "Weapon",
-    type: "Staff",
-    des: "A basic Staff",
-    atr: "Magical",
-    element: Elements::NEUTRAL,
-    pow: 1
-  }
-
 end
 
 def load_title(scene, args)
@@ -152,6 +133,14 @@ end
 def iterate_buttons(buttons, args)
   position = 0
   buttons.each do |button|
+    if button[:type] == BATTLE
+      button_creator(button[:text], 10000, position, args)
+      # activates battle screen and launches battle
+      args.state.post_battle_screen = button[:state]
+      args.state.enemy_party = button[:effect]
+      position += 1
+      next
+    end
     button_creator(button[:text], button[:state], position, args)
     position += 1
   end
@@ -168,9 +157,9 @@ def game(args)
     split_script(Game_Script::SCRIPT[2][:scene], args)
     iterate_buttons(Game_Script::SCRIPT[2][:buttons], args)
   when 3
-    args.outputs.labels << [640, 540, Game_Script::SCRIPT[3], 5, 1]
-    button_creator("Forward", 2, 2, args)
-    button_creator("Backward", 0, 1, args)
+    load_title(Game_Script::SCRIPT[3][:title], args)
+    split_script(Game_Script::SCRIPT[3][:scene], args)
+    iterate_buttons(Game_Script::SCRIPT[3][:buttons], args)
   else
     args.outputs.labels << [640, 540, 'Testing!', 5, 1]
     button_creator("Forward", 2, 2, args)
@@ -190,51 +179,54 @@ def game_state(args)
 end
 
 def battle_screen(args)
-  
-end
-
-def launch_battle(args)
-  args.state.screen = 10000
+  #this will show, but not calculate the battle
 end
 
 def battle(enemies, args)
-
+  #this will go through the turns and calculate the battle
+  #
 end
 
 def main_menu(args)
-  # args.state.dark_mode ||= true
-  # theme(args)
-  x = 840
-  y = 540
+  dark_mode_button(args)
   if args.state.dark_mode == false
-  args.outputs.labels << [640, 540, 'Textia Dragonruby!', 5, 1, 0, 0, 0]
-  main_label = {
-    x:                       x,
-    y:                       y,
-    text:                    "Dark Mode",
-    size_enum:               2,
-    alignment_enum:          1, # 0 = left, 1 = center, 2 = right
-    r:                       0,
-    g:                       0,
-    b:                       0,
-    a:                       255,
-    # font:                    "fonts/manaspc.ttf",
-    vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
-  }
-  main_border = {
-    x: x,
-    y: y,
-    w: 100,
-    h: 50,
-    r: 0,
-    g: 0,
-    b: 0,
-    a: 255,
-    vertical_alignment_enum: 0
-  }
+    args.outputs.labels << [640, 540, 'Textia Dragonruby!', 5, 1, 0, 0, 0]
   else
     args.outputs.labels << [640, 540, 'Textia Dragonruby!', 5, 1, 255, 255, 255]
-    main_label = {
+  end
+  button_creator("Start Game", 1, "start", args)
+end
+
+def dark_mode_button(args)
+  x = 940
+  y = 540
+  if args.state.dark_mode == false
+    dark_mode_label = {
+      x:                       x,
+      y:                       y,
+      text:                    "Dark Mode",
+      size_enum:               2,
+      alignment_enum:          1, # 0 = left, 1 = center, 2 = right
+      r:                       0,
+      g:                       0,
+      b:                       0,
+      a:                       255,
+      # font:                    "fonts/manaspc.ttf",
+      vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
+    }
+    dark_mode_border = {
+      x: x - 70,
+      y: y,
+      w: 100,
+      h: 50,
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 255,
+      vertical_alignment_enum: 0
+    }
+  else
+    dark_mode_label = {
       x:                       x,
       y:                       y,
       text:                    "Light Mode",
@@ -247,10 +239,10 @@ def main_menu(args)
       # font:                    "fonts/manaspc.ttf",
       vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
     }
-    main_border = {
-      x: x,
+    dark_mode_border = {
+      x: x - 70,
       y: y,
-      w: 100,
+      w: 150,
       h: 50,
       r: 255,
       g: 255,
@@ -258,15 +250,12 @@ def main_menu(args)
       a: 255,
       vertical_alignment_enum: 0
     }
-
   end
-  button_creator("Start Game", 1, "start", args)
-
-  args.outputs.labels << main_label
-  args.outputs.borders << main_border
+  args.outputs.labels << dark_mode_label
+  args.outputs.borders << dark_mode_border
 
   if (args.inputs.mouse.click) &&
-    (args.inputs.mouse.point.inside_rect? main_border)
+    (args.inputs.mouse.point.inside_rect? dark_mode_border)
     args.gtk.notify! "button was clicked"
     args.state.dark_mode = !args.state.dark_mode
     puts args.state.dark_mode
@@ -276,28 +265,28 @@ end
 def button_creator(text, state, position, args)
   case position
   when 0
-    x = 80
-    y = 30
+    x = 100
+    y = 50
   when 1
-    x = 80
-    y = 80
+    x = 340
+    y = 50
   when 2
-    x = 150
-    y = 150
+    x = 450
+    y = 50
   when "start"
     x = 600
     y = 400
   else
     # type code here
-    x = 100
-    y = 100
+    x = 800
+    y = 50
   end
   if args.state.dark_mode == false
     label = {
       x:                       x,
       y:                       y,
       text:                    text,
-      size_enum:               2,
+      size_enum:               1,
       alignment_enum:          1, # 0 = left, 1 = center, 2 = right
       r:                       0,
       g:                       0,
@@ -307,9 +296,9 @@ def button_creator(text, state, position, args)
       vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
     }
     border = {
-      x: x,
+      x: x - 70,
       y: y,
-      w: 100,
+      w: 170,
       h: 50,
       r: 0,
       g: 0,
@@ -322,7 +311,7 @@ def button_creator(text, state, position, args)
       x:                       x,
       y:                       y,
       text:                    text,
-      size_enum:               2,
+      size_enum:               1,
       alignment_enum:          1, # 0 = left, 1 = center, 2 = right
       r:                       255,
       g:                       255,
@@ -332,9 +321,9 @@ def button_creator(text, state, position, args)
       vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
     }
     border = {
-      x: x,
+      x: x - 70,
       y: y,
-      w: 100,
+      w: 170,
       h: 50,
       r: 255,
       g: 255,
@@ -357,19 +346,19 @@ end
 def theme(args)
   if args.state.dark_mode == false
     args.outputs.solids << [0, 0, 1280, 720, 255, 255, 255]
-    args.outputs.labels << [100, 100, "#{args.state.screen}", 5, 1, 0, 0, 0]
+    args.outputs.labels << [1200, 100, "#{args.state.screen}", 5, 1, 0, 0, 0]
   else
     args.outputs.solids << [0, 0, 1280, 720, 0, 0, 0]
-    args.outputs.labels << [100, 100, "#{args.state.screen}", 5, 1, 255, 255, 255]
+    args.outputs.labels << [1200, 100, "#{args.state.screen}", 5, 1, 255, 255, 255]
   end
   puts args.state.dark_mode
 end
 
 def tick(args)
-  args.state.dark_mode ||= false
+  args.state.dark_mode ||= true
   theme(args)
+  args.state.enemy_party ||= []
   init_args(args)
-  init_enemies(args)
   game_state(args)
 
 end
