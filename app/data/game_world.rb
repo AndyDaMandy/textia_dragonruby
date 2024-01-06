@@ -1,8 +1,10 @@
 module Game_Script
+  include Elements
+  include Enemies
   SCRIPT = {
     1 => {
       title: "Amaryllis Town",
-      scene: "Amaryllis Town\n
+      scene: "
       Shaman: \"Hello Ando and Marie, today is the day of your pilgrimage.\n
       Our town needs a new crystal and you both are going to the Crystal Lake to gather one for us\n
       Without it we cannot protect ourselves from monsters much longer.\n
@@ -15,18 +17,18 @@ module Game_Script
     },
     2 => {
       title: "The Forest",
-      scene: "The Forest\n
+      scene: "
             You've found yourself in a mysterious forest. It's full of danger at every turn.\n
             You're worried the danger might be too high, maybe you should head back to town?",
       buttons: [buttons: [{type: "scene", state: 1, text: "Back to Town"}, {type: {type: "scene", enemies: nil, item: nil}, state: 3, text: "To the Large Tree"}]]
     },
     3 => {
       title: "The Large Tree",
-      scene: "The Large Tree\n
+      scene: "
               You've found a large tree!\n
               There are enemies near it!\n
               Will you fight?",
-      buttons: [{type: {type: "battle", enemies: [goblin, potatoThief, goblin], item: nil }, state: 4 , text: "Fight"}, {state: 2, text: "Run"}]
+      buttons: [{type: {type: "battle", enemies: [GOBLIN, POTATO_THIEF, GOBLIN], item: nil }, state: 4 , text: "Fight"}, {state: 2, text: "Run"}]
     }
 }
 end

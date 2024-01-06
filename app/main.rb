@@ -1,16 +1,19 @@
-require '/app/data/characters.rb'
+require '/app/data/elements.rb'
 require '/app/data/skills.rb'
+require '/app/data/enemies.rb'
+require '/app/data/characters.rb'
 require '/app/data/enemies.rb'
 require '/app/data/game_world.rb'
 require '/app/data/items.rb'
 require '/app/data/skills.rb'
-require '/app/data/elements.rb'
+
 
 def init_args(args)
   include Elements
   include Game_Script
 
   args.state.screen ||= 0
+  args.state.post_battle_screen ||= 0
   args.state.ando ||= {
     name: 'Ando',
     level: 1,
@@ -127,6 +130,14 @@ def init_args(args)
 
 end
 
+def load_title(scene, args)
+  if args.state.dark_mode == false
+    args.outputs.labels << [640, 570, scene, 5, 1, 0, 0, 0]
+  else
+    args.outputs.labels << [640, 570, scene, 5, 1, 255, 255, 255]
+  end
+end
+
 def split_script(scene, args)
   split_script = scene.split("\n")
   split_script.each_with_index do |line, i|
@@ -149,9 +160,11 @@ end
 def game(args)
   case args.state.screen
   when 1
+    load_title(Game_Script::SCRIPT[1][:title], args)
     split_script(Game_Script::SCRIPT[1][:scene], args)
     iterate_buttons(Game_Script::SCRIPT[1][:buttons], args)
   when 2
+    load_title(Game_Script::SCRIPT[2][:title], args)
     split_script(Game_Script::SCRIPT[2][:scene], args)
     iterate_buttons(Game_Script::SCRIPT[2][:buttons], args)
   when 3
@@ -170,13 +183,21 @@ def game_state(args)
   when 0
     main_menu(args)
   when 10000
-    battle(enemies, new_state, args)
+    battle_screen(args)
   else
     game(args)
   end
 end
 
-def battle(enemies, new_state, args)
+def battle_screen(args)
+  
+end
+
+def launch_battle(args)
+  args.state.screen = 10000
+end
+
+def battle(enemies, args)
 
 end
 
@@ -350,6 +371,5 @@ def tick(args)
   init_args(args)
   init_enemies(args)
   game_state(args)
-
 
 end
