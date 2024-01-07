@@ -1,6 +1,7 @@
 module Game_Script
   include Elements
   include Enemies
+  include Items
   SCENE = "Scene"
   BATTLE = "Battle"
   TREASURE = "Treasure"
@@ -29,7 +30,14 @@ module Game_Script
               There are enemies near it!\n
               Will you fight?",
       buttons: [{type: BATTLE, state: 4 , text: "Fight", effect: [GOBLIN, POTATO_THIEF, GOBLIN]}, {type: SCENE, state: 2, text: "Run"}]
-    }
+    },
+  4 => {
+    title:  "The Large Tree - 2",
+    scene: "After defeating the enemies you can now approach the tree\n
+          there you find a treasure chest\n
+          Will you open it?\n",
+    buttons: [{type: TREASURE, state: 5, text: "Open Chest", effect: [POTION]}, {type: SCENE, state: 5, text: "Go Forward"}]
+  },
 }
 end
 

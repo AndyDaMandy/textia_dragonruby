@@ -165,7 +165,7 @@ def iterate_buttons(buttons, args)
   end
 end
 
-def game(args)
+def story_mode(args)
   case args.state.location
   when 1
     script_and_buttons_load(SCRIPT[1], args)
@@ -173,9 +173,11 @@ def game(args)
     script_and_buttons_load(SCRIPT[2], args)
   when 3
     script_and_buttons_load(SCRIPT[3], args)
+  when 4
+    script_and_buttons_load(SCRIPT[4], args)
   else
     args.outputs.labels << [640, 540, 'Something went wrong!', 5, 1]
-    button_creator("Main Menu", SCREEN, 2, 2, args)
+    button_creator("Main Menu", SCREEN, 0, 2, args)
   end
 end
 
@@ -186,12 +188,13 @@ def game_state(args)
   when 1
     battle_screen(args)
   when 2
-    game(args)
+    story_mode(args)
   when 3
     #game menu
+    # game menu contains functions to show inventory, skills, etc.
   else
     args.outputs.labels << [640, 540, 'Something went wrong!', 5, 1]
-    button_creator("Main Menu", SCREEN, 2, 2, args)
+    button_creator("Main Menu", SCREEN, 0, 2, args)
   end
 end
 
@@ -357,7 +360,7 @@ def button_creator(text, type, state, position, args)
     if (args.inputs.mouse.click) &&
       (args.inputs.mouse.point.inside_rect? border)
       args.gtk.notify! "button was clicked"
-      args.state.screen = 2
+      args.state.screen = state
     end
   when BATTLE
     if (args.inputs.mouse.click) &&

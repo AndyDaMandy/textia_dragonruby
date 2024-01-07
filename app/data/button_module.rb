@@ -2,6 +2,8 @@ module Button_types
   SCREEN = "screen"
   SCENE = "scene"
   BATTLE = "battle"
+  TREASURE = "treasure"
+  GAME_MENU = "game_menu"
   # START = "start"
   # DARK_MODE = "dark_mode"
   # LIGHT_MODE = "light_mode"
