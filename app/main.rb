@@ -1,11 +1,10 @@
 require '/app/data/button_module.rb'
 require '/app/data/elements.rb'
+require '/app/data/items.rb'
 require '/app/data/skills.rb'
 require '/app/data/enemies.rb'
 require '/app/data/characters.rb'
-require '/app/data/enemies.rb'
 require '/app/data/game_world.rb'
-require '/app/data/items.rb'
 require '/app/data/skills.rb'
 
 
@@ -14,6 +13,7 @@ def init_args(args)
   include Enemies
   include Game_Script
   include Button_types
+  include Items
   # initial setup
   if args.state.tick_count == 0
     args.state.dark_mode = true
@@ -192,6 +192,9 @@ def game_state(args)
   when 3
     #game menu
     # game menu contains functions to show inventory, skills, etc.
+  when 4
+    # treasure screen
+    # this will show the treasure and give the player the item
   else
     args.outputs.labels << [640, 540, 'Something went wrong!', 5, 1]
     button_creator("Main Menu", SCREEN, 0, 2, args)
@@ -367,6 +370,12 @@ def button_creator(text, type, state, position, args)
       (args.inputs.mouse.point.inside_rect? border)
       args.gtk.notify! "button was clicked"
       args.state.screen = 1
+    end
+  when TREASURE
+    if (args.inputs.mouse.click) &&
+      (args.inputs.mouse.point.inside_rect? border)
+      args.gtk.notify! "button was clicked"
+      args.state.screen = 4
     end
   when SCENE
     if (args.inputs.mouse.click) &&
