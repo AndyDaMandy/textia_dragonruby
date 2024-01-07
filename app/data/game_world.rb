@@ -1,4 +1,5 @@
 module Game_Script
+  include Button_types
   include Elements
   include Enemies
   include Items
@@ -29,7 +30,7 @@ module Game_Script
       scene: "You've found a large tree!\n
               There are enemies near it!\n
               Will you fight?",
-      buttons: [{type: BATTLE, state: 4 , text: "Fight", effect: [GOBLIN, POTATO_THIEF, GOBLIN]}, {type: SCENE, state: 2, text: "Run"}]
+      buttons: [{type: BATTLE, state: 4 , text: "Fight", effect: [GOBLIN, POTATO_THIEF, GOBLIN]}]
     },
   4 => {
     title:  "The Large Tree - 2",

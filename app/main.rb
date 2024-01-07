@@ -3,9 +3,9 @@ require '/app/data/elements.rb'
 require '/app/data/items.rb'
 require '/app/data/skills.rb'
 require '/app/data/enemies.rb'
+require '/app/data/weapons.rb'
 require '/app/data/characters.rb'
 require '/app/data/game_world.rb'
-require '/app/data/skills.rb'
 
 
 def init_args(args)
@@ -13,6 +13,7 @@ def init_args(args)
   include Enemies
   include Game_Script
   include Button_types
+  include Weapons
   include Items
   # initial setup
   if args.state.tick_count == 0
@@ -37,8 +38,7 @@ def init_args(args)
       buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
       skills: [],
       support: [],
-      weapon: 'Text',
-      type: 'Player'
+      weapon: WOOD_SWORD,
     }
     args.state.marie ||= {
       name: 'Marie',
@@ -56,8 +56,7 @@ def init_args(args)
       buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
       skills: [],
       support: [],
-      weapon: 'Text',
-      type: 'Player'
+      weapon: WOOD_STAFF,
     }
     args.state.julie ||= {
       name: 'Julie',
@@ -117,10 +116,13 @@ def init_args(args)
       type: 'Player'
     }
     # rest of my setup/default state
+    args.state.player_party ||= [args.state.ando, args.state.marie]
   end
   # loads theme
   theme(args)
-
+  puts "Screen State: #{args.state.screen}, Story Location #{args.state.location}, post-battle state: #{args.state.post_battle_screen}, Dark Mode Status: #{args.state.dark_mode}"
+  # puts "Player Party: #{args.state.player_party}"
+  puts "Enemy Party: #{args.state.enemy_party}"
 end
 
 def script_and_buttons_load(scene, args)
@@ -158,7 +160,7 @@ def iterate_buttons(buttons, args)
       args.state.post_battle_screen = button[:state]
       args.state.enemy_party = button[:effect]
       position += 1
-      next
+      puts "created a battle button!"
     end
     button_creator(button[:text], SCENE, button[:state], position, args)
     position += 1
@@ -203,9 +205,53 @@ end
 
 def battle_screen(args)
   #this will show, but not calculate the battle
+  if args.state.dark_mode == false
+    r = 0
+    g = 0
+    b = 0
+  else
+    r = 255
+    g = 255
+    b = 255
+  end
+  args.outputs.labels << [640, 700, 'Battle', 5, 1, r, g, b]
+  args.outputs.labels << [640, 600, 'Enemy Party', 5, 1, r, g, b]
+  if args.state.enemy_party.length == 1
+   args.outputs.labels << [400, 550, "#{args.state.enemy_party[0].name}", 5, 1, r, g, b]
+  elsif args.state.enemy_party.length == 2
+    args.outputs.labels << [400, 550, "#{args.state.enemy_party[0].name}", 5, 1, r, g, b]
+    args.outputs.labels << [600, 550, "#{args.state.enemy_party[1].name}", 5, 1, r, g, b]
+  else
+    args.outputs.labels << [400, 550, "#{args.state.enemy_party[0].name}", 5, 1, r, g, b]
+    args.outputs.labels << [600, 550, "#{args.state.enemy_party[1].name}", 5, 1, r, g, b]
+    args.outputs.labels << [800, 550, "#{args.state.enemy_party[2].name}", 5, 1, r, g, b]
+  end
+  args.outputs.labels << [640, 460, 'Player Party', 5, 1, r, g, b]
+  args.outputs.labels << [400, 400, "#{args.state.player_party[0].name}", 5, 1, r, g, b]
+  args.outputs.labels << [400, 360, "HP: #{args.state.player_party[0].chp} / #{args.state.player_party[0].hp}", 5, 1, r, g, b]
+  args.outputs.labels << [400, 320, "MP: #{args.state.player_party[0].cmp} / #{args.state.player_party[0].mp}", 5, 1, r, g, b]
+  args.outputs.labels << [640, 400, "#{args.state.player_party[1].name}", 5, 1, r, g, b]
+  args.outputs.labels << [640, 360, "HP: #{args.state.player_party[1].chp} / #{args.state.player_party[1].hp}", 5, 1, r, g, b]
+  args.outputs.labels << [640, 320, "MP: #{args.state.player_party[1].cmp} / #{args.state.player_party[1].mp}", 5, 1, r, g, b]
+  if args.state.player_party.length == 3
+    args.outputs.labels << [800, 400, "#{args.state.player_party[2].name}", 5, 1, r, g, b]
+    args.outputs.labels << [800, 360, "HP: #{args.state.player_party[2].chp} / #{args.state.player_party[2].hp}", 5, 1, r, g, b]
+    args.outputs.labels << [800, 320, "MP: #{args.state.player_party[2].cmp} / #{args.state.player_party[2].mp}", 5, 1, r, g, b]
+  end
+  args.outputs.labels << [640, 280, "Turn: #{args.state.turn}", 5, 1, r, g, b]
+  #
+  # battle_buttons(args)
+  #
+end
+
+def battle_buttons(args)
+  # this will display the buttons for the battle screen
+
 end
 
 def battle(enemies, args)
+  args.state.turn ||= 1
+
   #this will go through the turns and calculate the battle
   #
 end
