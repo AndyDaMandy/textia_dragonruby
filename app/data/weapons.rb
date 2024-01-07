@@ -44,4 +44,13 @@ module Weapons
     element: NEUTRAL,
     pow: 1
   }
+  WOOD_BOW = {
+    name: "Wooden Bow",
+    category: WEAPON,
+    type: BOW,
+    des: "A basic wooden bow",
+    atr: PHYSICAL,
+    element: NEUTRAL,
+    pow: 1
+  }
 end

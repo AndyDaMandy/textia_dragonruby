@@ -74,8 +74,7 @@ def init_args(args)
       buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
       skills: [],
       support: [],
-      weapon: 'Text',
-      type: 'Player'
+      weapon: WOOD_BOW,
     }
     args.state.ari ||= {
       name: 'Ari',
@@ -116,12 +115,12 @@ def init_args(args)
       type: 'Player'
     }
     # rest of my setup/default state
-    args.state.player_party ||= [args.state.ando, args.state.marie]
+    args.state.player_party ||= [args.state.ando, args.state.marie, args.state.julie]
   end
   # loads theme
   theme(args)
   puts "Screen State: #{args.state.screen}, Story Location #{args.state.location}, post-battle state: #{args.state.post_battle_screen}, Dark Mode Status: #{args.state.dark_mode}"
-  # puts "Player Party: #{args.state.player_party}"
+  puts "Player Party: #{args.state.player_party}"
   puts "Enemy Party: #{args.state.enemy_party}"
 end
 
@@ -161,8 +160,9 @@ def iterate_buttons(buttons, args)
       args.state.enemy_party = button[:effect]
       position += 1
       puts "created a battle button!"
-    end
+    else
     button_creator(button[:text], SCENE, button[:state], position, args)
+    end
     position += 1
   end
 end
@@ -234,14 +234,14 @@ def battle_screen(args)
   args.outputs.labels << [640, 360, "HP: #{args.state.player_party[1].chp} / #{args.state.player_party[1].hp}", 5, 1, r, g, b]
   args.outputs.labels << [640, 320, "MP: #{args.state.player_party[1].cmp} / #{args.state.player_party[1].mp}", 5, 1, r, g, b]
   if args.state.player_party.length == 3
-    args.outputs.labels << [800, 400, "#{args.state.player_party[2].name}", 5, 1, r, g, b]
-    args.outputs.labels << [800, 360, "HP: #{args.state.player_party[2].chp} / #{args.state.player_party[2].hp}", 5, 1, r, g, b]
-    args.outputs.labels << [800, 320, "MP: #{args.state.player_party[2].cmp} / #{args.state.player_party[2].mp}", 5, 1, r, g, b]
+    args.outputs.labels << [840, 400, "#{args.state.player_party[2].name}", 5, 1, r, g, b]
+    args.outputs.labels << [840, 360, "HP: #{args.state.player_party[2].chp} / #{args.state.player_party[2].hp}", 5, 1, r, g, b]
+    args.outputs.labels << [840, 320, "MP: #{args.state.player_party[2].cmp} / #{args.state.player_party[2].mp}", 5, 1, r, g, b]
   end
   args.outputs.labels << [640, 280, "Turn: #{args.state.turn}", 5, 1, r, g, b]
   #
   # battle_buttons(args)
-  #
+  battle(args.state.player_party, args.state.enemy_party, args)
 end
 
 def battle_buttons(args)
@@ -249,9 +249,18 @@ def battle_buttons(args)
 
 end
 
-def battle(enemies, args)
+def battle(players, enemies, args)
   args.state.turn ||= 1
+  case args.state.turn
+  when 1
+    # player turn
+    # this will display the player's skills and allow them to choose one
+    
+  when 2
 
+  else
+
+  end
   #this will go through the turns and calculate the battle
   #
 end
