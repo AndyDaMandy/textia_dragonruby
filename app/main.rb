@@ -123,8 +123,8 @@ def init_args(args)
   end
   # loads theme
   theme(args)
-  puts "Screen State: #{args.state.screen}, Story Location #{args.state.location}, post-battle state: #{args.state.post_battle_screen}, Dark Mode Status: #{args.state.dark_mode}"
-  puts "Player Party: #{args.state.player_party}"
+  puts "Screen State: #{args.state.screen}, Story Location #{args.state.location}, post-battle state: #{args.state.post_battle_screen}"
+  # puts "Player Party: #{args.state.player_party}"
   puts "Enemy Party: #{args.state.enemy_party}"
 end
 
@@ -163,7 +163,6 @@ def iterate_buttons(buttons, args)
       args.state.post_battle_screen = button[:state]
       args.state.enemy_party = button[:effect]
       position += 1
-      puts "created a battle button!"
     else
     button_creator(button[:text], SCENE, button[:state], position, args)
     end
@@ -245,15 +244,11 @@ def battle_screen(args)
   args.outputs.labels << [640, 280, "Turn: #{args.state.turn}", 5, 1, r, g, b]
   #
   # battle_buttons(args)
-  battle(args.state.enemy_party, args)
+  battle_setup(args.state.enemy_party, args)
+  battle_flow(args.state.battle_state, args)
 end
 
-def battle_buttons(args)
-  # this will display the buttons for the battle screen
-
-end
-
-def battle(enemies, args)
+def battle_setup(enemies, args)
   # battleState controls battle flow and button creation.
   args.state.battle_state ||= 0
 
@@ -275,10 +270,10 @@ def battle(enemies, args)
     args.state.battle_state = 2
   end
 
-  battle_move(args.state.battle_state, args)
+  # battle_flow(args.state.battle_state, args)
 end
 
-def battle_move(turn, args)
+def battle_flow(turn, args)
   # case 0 is not used here, as it's used to initialize the battle
   # case 1 is the win screen
   # case 2 is the first player turn
@@ -318,9 +313,13 @@ def battle_move(turn, args)
     case args.state.choice
     when 0
       # attack
-      args.outputs.labels << [640, 540, "Attack Selected! Please select a target:", 5, 1, r, g, b]
+      args.outputs.labels << [640, 220, "Attack Selected! Please select a target:", 5, 1, r, g, b]
       # TODO: Button creator method that will create buttons for each enemy and include a back button to go back to case 2
       # Those buttons will contain targets for the enemies
+      # TODO: create a method that will generate the target button
+      args.state.enemy_party.each_with_index do |enemy, i|
+        target_buttons(enemy, args, i)
+      end
     when 1
       # skills
     when 2
@@ -328,8 +327,11 @@ def battle_move(turn, args)
     else
       # this shouldn't happen
     end
+  when 4
+    # damage calculation and show information
+    args.outputs.labels << [640, 220, 'You did it! You made it to step 4! Yay!', 5, 1, r, g, b]
   else
-    args.outputs.labels << [640, 540, 'Something went wrong! Whoopsies', 5, 1, r, g, b]
+    args.outputs.labels << [640, 220, 'Something went wrong! Whoopsies', 5, 1, r, g, b]
   end
 end
 
@@ -405,7 +407,7 @@ def battle_options(type, position, choice, args)
   if (args.inputs.mouse.click) &&
     (args.inputs.mouse.point.inside_rect? border)
     args.gtk.notify! "button was clicked"
-    args.state.battle_state = 2
+    args.state.battle_state = 3
     case choice
     when 0
       # attack
@@ -420,10 +422,80 @@ def battle_options(type, position, choice, args)
       # this shouldn't happen
       args.state.choice = 0
     end
-    battle_move(args.state.battle_state, args)
+    battle_flow(args.state.battle_state, args)
   end
 end
 
+def target_buttons(enemy, args, position)
+  # we iterate over the enemy party and create a button for each enemy, so this is just the individual button
+  case args.state.dark_mode
+  when false
+    r = 0
+    g = 0
+    b = 0
+  else
+    r = 255
+    g = 255
+    b = 255
+  end
+  case position
+  when 0
+    x = 100
+    y = 50
+  when 1
+    x = 340
+    y = 50
+  when 2
+    x = 550
+    y = 50
+  else
+    x = 800
+    y = 50
+  end
+  text = "#{enemy.name}"
+  label = {
+    x:                       x,
+    y:                       y,
+    text:                    text,
+    size_enum:               1,
+    alignment_enum:          1, # 0 = left, 1 = center, 2 = right
+    r:                       r,
+    g:                       g,
+    b:                       b,
+    a:                       255,
+    # font:                    "fonts/manaspc.ttf",
+    vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
+  }
+  border = {
+    x: x - 70,
+    y: y,
+    w: 170,
+    h: 50,
+    r: r,
+    g: g,
+    b: b,
+    a: 255,
+    vertical_alignment_enum: 0
+  }
+  args.outputs.labels << label
+  args.outputs.borders << border
+  if (args.inputs.mouse.click) &&
+    (args.inputs.mouse.point.inside_rect? border)
+    args.gtk.notify! "button was clicked"
+    # this should pull up enemy names...why doesn't it?
+    args.state.battle_state = 4
+    args.state.target ||= enemy
+  end
+
+end
+
+def skill_button_generator(skill, position, args)
+  # this will create a button for each skill
+end
+
+def item_button_generator(item, position, args)
+  # this will create a button for each item
+end
 
 def main_menu(args)
   # displays dark mode toggle on start
@@ -510,7 +582,7 @@ def button_creator(text, type, state, position, args)
     x = 340
     y = 50
   when 2
-    x = 450
+    x = 550
     y = 50
   when "start"
     x = 600
