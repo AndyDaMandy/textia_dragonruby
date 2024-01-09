@@ -249,21 +249,69 @@ def battle_buttons(args)
 
 end
 
-def battle(players, enemies, args)
-  args.state.turn ||= 1
-  case args.state.turn
+def battle(enemies, args)
+  # battleState controls battle flow and button creation.
+  args.state.battle_state ||= 0
+
+  # 0 is the init state
+  if args.state.battle_state == 0
+    args.state.enemy_party = enemies
+    args.state.win_money  ||= 0
+    args.state.exp_gain ||= 0
+    args.state.enemy_hp ||= []
+    args.state.player_hp ||= []
+    args.state.player_mp ||= []
+    args.state.dead_team ||= []
+    args.state.enemy_items ||= []
+
+    enemies.each do |e|
+      args.state.exp_gain += e.exp
+      args.state.win_money += e.money
+    end
+    args.state.battle_state = 2
+  end
+
+  battle_move(args.state.battle_state, args)
+end
+
+def battle_move(turn, args)
+  # case 0 is not used here, as it's used to initialize the battle
+  # case 1 is the win screen
+  # case 2 is the first player turn
+  case turn
   when 1
-    # player turn
-    # this will display the player's skills and allow them to choose one
-    
+    # win screen
+    # TODO: Consider copying the player_party and enemy_party arrays to a new array and then using that to calculate the win screen rather than mutating the original arrays
+    if args.state.dead_team.length > 0
+      args.state.dead_team.each do |char|
+        args.state.current_party.push(char)
+      end
+      args.state.dead_team ||= 0
+
+    end
+    # Todo: money, exp, and level up
+    # TODO: as well as a button to clear the battle screen and return to the story screen
   when 2
+    # player turn
+    args.outputs.labels << [640, 540, "#{args.state.player_party[0].name}'s Turn. Please select a command'", 5, 1]
+    # button creator method will go here
+    # TODO: create a button creator method that will create buttons for each skill, item, and attack
 
   else
-
+    args.outputs.labels << [640, 540, 'Something went wrong! Whoopsies', 5, 1]
   end
-  #this will go through the turns and calculate the battle
-  #
 end
+
+def attack_button(player, args)
+
+end
+def skill_button(player, args)
+
+end
+def item_button(player, inventory, args)
+
+end
+
 
 def main_menu(args)
   # displays dark mode toggle on start
