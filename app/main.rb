@@ -10,6 +10,7 @@ require '/app/data/game_world.rb'
 
 def init_args(args)
   include Elements
+  include Skills
   include Enemies
   include Game_Script
   include Button_types
@@ -21,7 +22,10 @@ def init_args(args)
     args.state.enemy_party ||= []
     args.state.screen ||= 0
     args.state.location ||= 1
+    args.state.weapon_inventory ||= []
+    args.state.inventory ||= [POTION, POTION, POTION]
     args.state.post_battle_screen ||= 0
+    # args.state.ando ||= Character.new('Ando', 1, 15, 15, 5, 5, 10, 4, 1, 2, 1, 0,[{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}], [BASHER, ICE_SLASH], [], WOOD_SWORD)
     args.state.ando ||= {
       name: 'Ando',
       level: 1,
@@ -36,7 +40,7 @@ def init_args(args)
       luck: 1,
       exp: 0,
       buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
-      skills: [],
+      skills: [BASHER, ICE_SLASH],
       support: [],
       weapon: WOOD_SWORD,
     }
@@ -54,7 +58,7 @@ def init_args(args)
       luck: 3,
       exp: 0,
       buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
-      skills: [],
+      skills: [FIRE],
       support: [],
       weapon: WOOD_STAFF,
     }
@@ -241,7 +245,7 @@ def battle_screen(args)
   args.outputs.labels << [640, 280, "Turn: #{args.state.turn}", 5, 1, r, g, b]
   #
   # battle_buttons(args)
-  battle(args.state.player_party, args.state.enemy_party, args)
+  battle(args.state.enemy_party, args)
 end
 
 def battle_buttons(args)
@@ -278,6 +282,16 @@ def battle_move(turn, args)
   # case 0 is not used here, as it's used to initialize the battle
   # case 1 is the win screen
   # case 2 is the first player turn
+  case args.state.dark_mode
+  when false
+    r = 0
+    g = 0
+    b = 0
+  else
+    r = 255
+    g = 255
+    b = 255
+  end
   case turn
   when 1
     # win screen
@@ -292,24 +306,122 @@ def battle_move(turn, args)
     # Todo: money, exp, and level up
     # TODO: as well as a button to clear the battle screen and return to the story screen
   when 2
-    # player turn
-    args.outputs.labels << [640, 540, "#{args.state.player_party[0].name}'s Turn. Please select a command'", 5, 1]
+    # player 1 turn
+    args.outputs.labels << [640, 220, "#{args.state.player_party[0].name}'s Turn. Please select a command:", 5, 1, r, g, b]
     # button creator method will go here
     # TODO: create a button creator method that will create buttons for each skill, item, and attack
-
+    battle_options(0, 0, 0, args)
+    battle_options(1, 1, 1, args)
+    battle_options(2, 2, 2, args)
+  when 3
+    # player 1 select target
+    case args.state.choice
+    when 0
+      # attack
+      args.outputs.labels << [640, 540, "Attack Selected! Please select a target:", 5, 1, r, g, b]
+      # TODO: Button creator method that will create buttons for each enemy and include a back button to go back to case 2
+      # Those buttons will contain targets for the enemies
+    when 1
+      # skills
+    when 2
+      # items
+    else
+      # this shouldn't happen
+    end
   else
-    args.outputs.labels << [640, 540, 'Something went wrong! Whoopsies', 5, 1]
+    args.outputs.labels << [640, 540, 'Something went wrong! Whoopsies', 5, 1, r, g, b]
   end
 end
 
-def attack_button(player, args)
+def battle_options(type, position, choice, args)
+  args.state.choice ||= 0
+  case position
+  when 0
+    x = 100
+    y = 50
+  when 1
+    x = 340
+    y = 50
+  when 2
+    x = 560
+    y = 50
+  else
+    x = 800
+    y = 50
+  end
 
-end
-def skill_button(player, args)
+  case args.state.dark_mode
+  when false
+    r = 0
+    g = 0
+    b = 0
+  else
+    r = 255
+    g = 255
+    b = 255
+  end
 
-end
-def item_button(player, inventory, args)
+  case type
+  when 0
+    # attack
+    text = "Attack"
+    # TODO: create a method that will generate the target button
 
+  when 1
+    # skills
+    text = "Skills"
+    # TODO: create a method that will generate the skill buttons
+  when 2
+    text = "Items"
+  else
+    text = "this button shouldn't exist!"
+  end
+  label = {
+    x:                       x,
+    y:                       y,
+    text:                    text,
+    size_enum:               1,
+    alignment_enum:          1, # 0 = left, 1 = center, 2 = right
+    r:                       r,
+    g:                       g,
+    b:                       b,
+    a:                       255,
+    # font:                    "fonts/manaspc.ttf",
+    vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
+  }
+  border = {
+    x: x - 70,
+    y: y,
+    w: 170,
+    h: 50,
+    r: r,
+    g: g,
+    b: b,
+    a: 255,
+    vertical_alignment_enum: 0
+  }
+  args.outputs.labels << label
+  args.outputs.borders << border
+  if (args.inputs.mouse.click) &&
+    (args.inputs.mouse.point.inside_rect? border)
+    args.gtk.notify! "button was clicked"
+    args.state.battle_state = 2
+    case choice
+    when 0
+      # attack
+      args.state.choice = 0
+    when 1
+      # skills
+      args.state.choice = 1
+    when 2
+      # items
+      args.state.choice = 2
+    else
+      # this shouldn't happen
+      args.state.choice = 0
+    end
+    battle_move(args.state.battle_state, args)
+  end
 end
 
 
@@ -407,41 +519,26 @@ def button_creator(text, type, state, position, args)
     x = 800
     y = 50
   end
-  if args.state.dark_mode == false
-    label = {
-      x:                       x,
-      y:                       y,
-      text:                    text,
-      size_enum:               1,
-      alignment_enum:          1, # 0 = left, 1 = center, 2 = right
-      r:                       0,
-      g:                       0,
-      b:                       0,
-      a:                       255,
-      # font:                    "fonts/manaspc.ttf",
-      vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
-    }
-    border = {
-      x: x - 70,
-      y: y,
-      w: 170,
-      h: 50,
-      r: 0,
-      g: 0,
-      b: 0,
-      a: 255,
-      vertical_alignment_enum: 0
-    }
+
+  case args.state.dark_mode
+  when false
+    r = 0
+    g = 0
+    b = 0
   else
+    r = 255
+    g = 255
+    b = 255
+  end
     label = {
       x:                       x,
       y:                       y,
       text:                    text,
       size_enum:               1,
       alignment_enum:          1, # 0 = left, 1 = center, 2 = right
-      r:                       255,
-      g:                       255,
-      b:                       255,
+      r:                       r,
+      g:                       g,
+      b:                       b,
       a:                       255,
       # font:                    "fonts/manaspc.ttf",
       vertical_alignment_enum: 0  # 0 = bottom, 1 = center, 2 = top
@@ -451,13 +548,12 @@ def button_creator(text, type, state, position, args)
       y: y,
       w: 170,
       h: 50,
-      r: 255,
-      g: 255,
-      b: 255,
+      r: r,
+      g: g,
+      b: b,
       a: 255,
       vertical_alignment_enum: 0
     }
-  end
   args.outputs.labels << label
   args.outputs.borders << border
 
