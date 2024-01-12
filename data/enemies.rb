@@ -41,7 +41,6 @@ module Enemy_types
     type: 'Flying',
     description: 'A creature that can fly'
   }
-
 end
 
 module Enemies
