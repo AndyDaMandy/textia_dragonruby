@@ -16,9 +16,13 @@ end
 # args.state.turn - handles moving between battle flow
 # args.state.choice - handles what choice was picked this turn
 # args.state.target - handles what target was picked this turn
+# Current party already exists in args.state
+# args.state.current_party (in init args)
+# args.state.enemy_party is also in init args
 
 def battle_screen(args)
-  #this will show, but not calculate the battle
+  # TODO consider having rendering logic separated here. Importantly, the state might be an issue right now.
+  # this will show, but not calculate the battle
   if args.state.dark_mode == false
     r = 0
     g = 0
@@ -77,6 +81,11 @@ def battle_setup(enemies, args)
     enemies.each do |e|
       args.state.exp_gain += e.exp
       args.state.win_money += e.money
+      if e.item != nil
+        args.state.enemy_items.push(e.item)
+      else
+        args.state.enemy_items.push(nil)
+      end
     end
     args.state.battle_state = 2
   end
@@ -107,6 +116,7 @@ def battle_flow(turn, args)
         args.state.current_party.push(char)
       end
       args.state.dead_team ||= 0
+      args.outputs.labels << [640, 220, "all enemies Defeated!", 5, 1, r, g, b]
 
     end
     # Todo: money, exp, and level up
@@ -114,11 +124,9 @@ def battle_flow(turn, args)
   when 2
     # player 1 turn
     args.outputs.labels << [640, 220, "#{args.state.player_party[0].name}'s Turn. Please select a command:", 5, 1, r, g, b]
-    # button creator method will go here
-    # TODO: create a button creator method that will create buttons for each skill, item, and attack
-    battle_options(0, 0, 0, args)
-    battle_options(1, 1, 1, args)
-    battle_options(2, 2, 2, args)
+    battle_options(0, 0, 0, 3, args)
+    battle_options(1, 1, 1, 3, args)
+    battle_options(2, 2, 2, 3, args)
   when 3
     # player 1 select target
     case args.state.choice
@@ -129,10 +137,11 @@ def battle_flow(turn, args)
       # Those buttons will contain targets for the enemies
       # TODO: create a method that will generate the target button
       args.state.enemy_party.each_with_index do |enemy, i|
-        target_buttons(enemy, args, i)
+        target_buttons(enemy, i, 4, args)
       end
     when 1
       # skills
+      skill_button_generator(args.state.player_party[0].skills, 0, 4, args)
     when 2
       # items
     else
@@ -146,7 +155,7 @@ def battle_flow(turn, args)
   end
 end
 
-def battle_options(type, position, choice, args)
+def battle_options(type, position, choice, state, args)
   args.state.choice ||= 0
   case position
   when 0
@@ -237,7 +246,7 @@ def battle_options(type, position, choice, args)
   if (args.inputs.mouse.click) &&
     (args.inputs.mouse.point.inside_rect? border)
     args.gtk.notify! "button was clicked"
-    args.state.battle_state = 3
+    args.state.battle_state = state
     case choice
     when 0
       # attack
@@ -255,7 +264,7 @@ def battle_options(type, position, choice, args)
   end
 end
 
-def target_buttons(enemy, args, position)
+def target_buttons(enemy, position, state, args)
   # we iterate over the enemy party and create a button for each enemy, so this is just the individual button
   w = 170
   h = 50
@@ -331,17 +340,23 @@ def target_buttons(enemy, args, position)
     (args.inputs.mouse.point.inside_rect? border)
     args.gtk.notify! "button was clicked"
     # this should pull up enemy names...why doesn't it?
-    args.state.battle_state = 4
+    args.state.battle_state = state
     args.state.target ||= enemy
   end
 
 end
 
-def skill_button_generator(skill, position, args)
+def skill_button_generator(player, position, state, args)
   # this will create a button for each skill
+  # TODO: create a method that will generate the skill buttons
+  # two branches based on skill type
+  # one does enemy target,
+  # other does ally target
+
 end
 
-def item_button_generator(item, position, args)
+def item_button_generator(position, state, args)
+  # we use the global args.state.inventory for this
   # this will create a button for each item
 end
 

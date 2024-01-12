@@ -21,7 +21,12 @@ module Item_rarity
   COMMON = {
     rarity: 'Common',
     description: 'Common item',
-    steal_rate: 60
+    steal_rate: 80
+  }
+  UNCOMMON = {
+    rarity: 'Uncommon',
+    description: 'Uncommon item',
+    steal_rate: 50
   }
   RARE = {
     rarity: 'Rare',
@@ -31,7 +36,7 @@ module Item_rarity
   LEGENDARY = {
     rarity: 'Legendary',
     description: 'Legendary item',
-    steal_rate: 20
+    steal_rate: 10
   }
 end
 
@@ -90,4 +95,6 @@ module Items
   include Item_effect
   include Item_target
   POTION = Item.new('Potion', CONSUMABLE, HEAL, 'Heals 50 HP', 10, COMMON, 50, ONE)
+  HI_POTION = Item.new('Hi-Potion', CONSUMABLE, HEAL, 'Heals 100 HP', 20, UNCOMMON, 100, ONE)
+  BLANK_ITEM = {name: 'Blank Item'}
 end

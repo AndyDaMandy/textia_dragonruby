@@ -27,6 +27,7 @@ def init_args(args)
     args.state.location ||= 1
     args.state.weapon_inventory ||= []
     args.state.inventory ||= [POTION, POTION, POTION]
+    args.state.key_items ||= []
     args.state.post_battle_screen ||= 0
     # args.state.ando ||= Character.new('Ando', 1, 15, 15, 5, 5, 10, 4, 1, 2, 1, 0,[{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}], [BASHER, ICE_SLASH], [], WOOD_SWORD)
     args.state.ando ||= {
@@ -44,7 +45,6 @@ def init_args(args)
       exp: 0,
       buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
       skills: [BASHER, ICE_SLASH],
-      support: [],
       weapon: WOOD_SWORD,
     }
     args.state.marie ||= {
@@ -62,7 +62,6 @@ def init_args(args)
       exp: 0,
       buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
       skills: [FIRE],
-      support: [],
       weapon: WOOD_STAFF,
     }
     args.state.julie ||= {
@@ -80,7 +79,6 @@ def init_args(args)
       exp: 30,
       buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
       skills: [],
-      support: [],
       weapon: WOOD_BOW,
     }
     args.state.ari ||= {
@@ -98,9 +96,7 @@ def init_args(args)
       exp: 50,
       buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
       skills: [],
-      support: [],
-      weapon: 'Text',
-      type: 'Player'
+      weapon: IRON_DAGGERS,
     }
     args.state.gabriel ||= {
       name: 'Gabriel',
@@ -118,8 +114,7 @@ def init_args(args)
       buff: [{type: "atk", pow: 0, on: false},{type: "def", pow: 0, on: false}],
       skills: [],
       support: [],
-      weapon: 'Text',
-      type: 'Player'
+      weapon: FIRE_TOME,
     }
     # rest of my setup/default state
     args.state.player_party ||= [args.state.ando, args.state.marie, args.state.julie]
@@ -135,12 +130,23 @@ def game_screen(args)
   # this is controls the screen of the game
   # args.state.screen controls the screen and is passed into this
   # We access different menus by flipping args.state.screen
+  case args.state.dark_mode
+  when false
+    r = 0
+    g = 0
+    b = 0
+  else
+    r = 255
+    g = 255
+    b = 255
+  end
   case args.state.screen
   when 0
     start_menu(args)
   when 1
     battle_screen(args)
-    # battle screen initializes the battle via 
+    # battle screen initializes the battle, sets enemies, etc.
+    # It also shows the battle and any updates via the battle_flow function
   when 2
     story_mode(args)
   when 3
@@ -151,12 +157,26 @@ def game_screen(args)
     # this will show the treasure and give the player the item
     # Perhaps treasure too
   else
-    args.outputs.labels << [640, 540, 'Something went wrong!', 5, 1]
+    args.outputs.labels << [640, 540, 'Something went wrong!', 5, 1, r, g, b]
     button_creator("Main Menu", SCREEN, 0, 2, args)
+  end
+end
+
+def pause_game(args)
+  # this will pause the game when not focused
+  if !args.inputs.keyboard.has_focus && args.gtk.production && args.state.tick_count != 0
+    args.outputs.background_color = [0, 0, 0]
+    args.outputs.labels << { x: 640,
+                             y: 360,
+                             text: "Game Paused (click to resume).",
+                             alignment_enum: 1,
+                             r: 255, g: 255, b: 255 }
+    # consider setting all audio volume to 0.0
   end
 end
 
 def tick(args)
   init_args(args)
   game_screen(args)
+  pause_game(args)
 end

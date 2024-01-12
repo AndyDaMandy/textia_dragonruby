@@ -88,10 +88,6 @@ module Skill_effects
     effect: 'Heal',
     description: 'Heals HP'
   }
-  DAMAGE = {
-    effect: 'Damage',
-    description: 'Deals damage'
-  }
   BUFF = {
     effect: 'Buff',
     description: 'Increases stats'
@@ -121,11 +117,12 @@ module Skills
   include Skill_targets
   include Skill_effects
   FIRE = Skill.new('Fire', PHYSICAL, FIRE, 'Hits enemy with magic-based fire damage', 2, 3, SINGLE, NONE)
-  BASHER = Skill.new('Basher', PHYSICAL, NEUTRAL, 'Deals physical damage to 1 enemy', 5, 3, ALL, NONE)
+  BASHER = Skill.new('Basher', PHYSICAL, NEUTRAL, 'Deals physical damage to 1 enemy', 5, 3, SINGLE, NONE)
   BURN = Skill.new('Burn', MAGICAL, FIRE, 'Burns the enemy', 2, 3, SINGLE, BURN)
   POISON = Skill.new('Poison', MAGICAL, NEUTRAL, 'Poisons the enemy', 2, 3, SINGLE, POISON)
   SLEEP = Skill.new('Sleep', MAGICAL, NEUTRAL, 'Puts the enemy to sleep', 2, 3, SINGLE, SLEEP)
   SLASH_ALL = Skill.new('Slash All', PHYSICAL, NEUTRAL, 'Deals physical damage to all enemies', 4, 6, ALL, NONE)
   ICE_SLASH = Skill.new('Ice Slash', PHYSICAL, ICE, 'Deals physical damage to 1 enemy', 5, 3, SINGLE, NONE)
+  HEAL = Skill.new('Heal', MAGICAL, NEUTRAL, 'Heals HP', 5, 3, SINGLE, HEAL)
 
 end
