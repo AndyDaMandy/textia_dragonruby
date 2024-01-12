@@ -13,6 +13,8 @@ end
 def dark_mode_button(args)
   x = 940
   y = 540
+  w = 170
+  h = 50
 
   if args.state.dark_mode == false
     r = 0
@@ -41,8 +43,8 @@ def dark_mode_button(args)
     dark_mode_border = {
       x: x - 70,
       y: y,
-      w: 150,
-      h: 50,
+      w: w,
+      h: h,
       r: r,
       g: g,
       b: b,
@@ -51,7 +53,23 @@ def dark_mode_button(args)
     }
 
   args.outputs.labels << dark_mode_label
-  args.outputs.borders << dark_mode_border
+
+  if args.inputs.mouse.point.inside_rect?(dark_mode_border)
+    dark_mode_border = {
+      x: x - 70,
+      y: y,
+      w: w + 30,
+      h: h + 20,
+      r: r,
+      g: g,
+      b: b,
+      a: 255,
+      vertical_alignment_enum: 0
+    }
+    args.outputs.borders << dark_mode_border
+  else
+    args.outputs.borders << dark_mode_border
+  end
 
   if (args.inputs.mouse.click) &&
     (args.inputs.mouse.point.inside_rect? dark_mode_border)

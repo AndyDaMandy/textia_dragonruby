@@ -15,7 +15,7 @@ end
 # variables
 # args.state.turn - handles moving between battle flow
 # args.state.choice - handles what choice was picked this turn
-# args.state.target - handles what target was picekd this turn
+# args.state.target - handles what target was picked this turn
 
 def battle_screen(args)
   #this will show, but not calculate the battle
@@ -174,6 +174,8 @@ def battle_options(type, position, choice, args)
     b = 255
   end
 
+  w = 180
+  h = 50
   case type
   when 0
     # attack
@@ -205,8 +207,8 @@ def battle_options(type, position, choice, args)
   border = {
     x: x - 70,
     y: y,
-    w: 170,
-    h: 50,
+    w: w,
+    h: h,
     r: r,
     g: g,
     b: b,
@@ -214,7 +216,24 @@ def battle_options(type, position, choice, args)
     vertical_alignment_enum: 0
   }
   args.outputs.labels << label
-  args.outputs.borders << border
+  if args.inputs.mouse.point.inside_rect?(border)
+    w = 200
+    h = 60
+    border = {
+      x: x - 70,
+      y: y,
+      w: w,
+      h: h,
+      r: r,
+      g: g,
+      b: b,
+      a: 255,
+      vertical_alignment_enum: 0
+    }
+    args.outputs.borders << border
+  else
+    args.outputs.borders << border
+  end
   if (args.inputs.mouse.click) &&
     (args.inputs.mouse.point.inside_rect? border)
     args.gtk.notify! "button was clicked"
@@ -238,6 +257,8 @@ end
 
 def target_buttons(enemy, args, position)
   # we iterate over the enemy party and create a button for each enemy, so this is just the individual button
+  w = 170
+  h = 50
   case args.state.dark_mode
   when false
     r = 0
@@ -279,8 +300,8 @@ def target_buttons(enemy, args, position)
   border = {
     x: x - 70,
     y: y,
-    w: 170,
-    h: 50,
+    w: w,
+    h: h,
     r: r,
     g: g,
     b: b,
@@ -288,7 +309,24 @@ def target_buttons(enemy, args, position)
     vertical_alignment_enum: 0
   }
   args.outputs.labels << label
-  args.outputs.borders << border
+  if args.inputs.mouse.point.inside_rect?(border)
+    w = 190
+    h = 70
+    border = {
+      x: x - 70,
+      y: y,
+      w: w,
+      h: h,
+      r: r,
+      g: g,
+      b: b,
+      a: 255,
+      vertical_alignment_enum: 0
+    }
+    args.outputs.borders << border
+  else
+    args.outputs.borders << border
+  end
   if (args.inputs.mouse.click) &&
     (args.inputs.mouse.point.inside_rect? border)
     args.gtk.notify! "button was clicked"
