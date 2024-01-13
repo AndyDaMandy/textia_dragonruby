@@ -144,7 +144,7 @@ def game_screen(args)
   when 0
     start_menu(args)
   when 1
-    battle_screen(args)
+    battle_flow(args)
     # battle screen initializes the battle, sets enemies, etc.
     # It also shows the battle and any updates via the battle_flow function
   when 2

@@ -57,10 +57,6 @@ def battle_screen(args)
     args.outputs.labels << [840, 320, "MP: #{args.state.player_party[2].cmp} / #{args.state.player_party[2].mp}", 5, 1, r, g, b]
   end
   args.outputs.labels << [640, 280, "Turn: #{args.state.turn}", 5, 1, r, g, b]
-  #
-  # battle_buttons(args)
-  battle_setup(args.state.enemy_party, args)
-  battle_flow(args.state.battle_state, args)
 end
 
 def battle_setup(enemies, args)
@@ -81,8 +77,8 @@ def battle_setup(enemies, args)
     enemies.each do |e|
       args.state.exp_gain += e.exp
       args.state.win_money += e.money
-      if e.item != nil
-        args.state.enemy_items.push(e.item)
+      if e.steal_item != nil
+        args.state.enemy_items.push(e.steal_item)
       else
         args.state.enemy_items.push(nil)
       end
@@ -93,7 +89,8 @@ def battle_setup(enemies, args)
   # battle_flow(args.state.battle_state, args)
 end
 
-def battle_flow(turn, args)
+def battle_flow(args)
+  battle_setup(args.state.enemy_party, args)
   # case 0 is not used here, as it's used to initialize the battle
   # case 1 is the win screen
   # case 2 is the first player turn
@@ -107,7 +104,7 @@ def battle_flow(turn, args)
     g = 255
     b = 255
   end
-  case turn
+  case args.state.battle_state
   when 1
     # win screen
     # TODO: Consider copying the player_party and enemy_party arrays to a new array and then using that to calculate the win screen rather than mutating the original arrays
@@ -122,12 +119,14 @@ def battle_flow(turn, args)
     # Todo: money, exp, and level up
     # TODO: as well as a button to clear the battle screen and return to the story screen
   when 2
+    battle_screen(args)
     # player 1 turn
     args.outputs.labels << [640, 220, "#{args.state.player_party[0].name}'s Turn. Please select a command:", 5, 1, r, g, b]
     battle_options(0, 0, 0, 3, args)
     battle_options(1, 1, 1, 3, args)
     battle_options(2, 2, 2, 3, args)
   when 3
+    battle_screen(args)
     # player 1 select target
     case args.state.choice
     when 0
@@ -148,8 +147,10 @@ def battle_flow(turn, args)
       # this shouldn't happen
     end
   when 4
+    battle_screen(args)
     # damage calculation and show information
     args.outputs.labels << [640, 220, 'You did it! You made it to step 4! Yay!', 5, 1, r, g, b]
+
   else
     args.outputs.labels << [640, 220, 'Something went wrong! Whoopsies', 5, 1, r, g, b]
   end
@@ -360,8 +361,34 @@ def item_button_generator(position, state, args)
   # this will create a button for each item
 end
 
-def attack_calculation(player, enemy, flow, args)
+def attack_calculation(player, enemy, args)
   # this will calculate the damage done to the enemy
   #TODO create a method that will calculate the damage done to the enemy
+  args.state.elemental_advantage ||= 0
+  case args.state.choice
+  when 0
+    # attack
+    if player.weapon.element == enemy.weakness
+      args.state.elemental_advantage = 2
+    else
+      args.state.elemental_advantage = 1
+    end
+    damage = player.p_atk *args.state.element_advantage - enemy.p_def
+    if damage < 0
+      damage = 2
+    end
+    enemy.chp -= damage
+    if enemy.chp <= 0
+      enemy.chp = 0
+      args.state.enemy_party.delete(enemy)
+      # we need to show that this happened
+    end
+  when 1
+    # skills calc
+  when 2
+    # Damage items calc
+  else
+    # this shouldn't happen
+  end
 
 end

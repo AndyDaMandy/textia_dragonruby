@@ -1,7 +1,7 @@
 class Enemy
-  attr_accessor :name, :level, :hp, :mp, :p_atk, :p_def, :m_atk, :m_def, :weakness, :exp, :money, :eSkills, :type, :steal
+  attr_accessor :name, :level, :hp, :mp, :p_atk, :p_def, :m_atk, :m_def, :weakness, :exp, :money, :eSkills, :type, :steal_item
 
-  def initialize(name, level, hp, mp, p_atk, p_def, m_atk, m_def, weakness, exp, money, e_skills, type, steal)
+  def initialize(name, level, hp, mp, p_atk, p_def, m_atk, m_def, weakness, exp, money, e_skills, type, steal_item)
     @name = name
     @level = level
     @hp = hp
@@ -15,17 +15,8 @@ class Enemy
     @money = money
     @e_skills = e_skills
     @type = type
-    @steal = steal
+    @steal_item = steal_item
   end
-end
-
-def init_enemies(args)
-  # Create instances of the Enemy class
-  # args.state.goblin ||= Enemy.new('Goblin', 1, 10, 0, 5, 2, 1, 1, Elements::ICE, 1, 1, [], 'Goblin', nil)
-  # args.state.potatoThief ||= Enemy.new('Potato Thief', 1, 10, 0, 5, 2, 1, 1, Elements::NEUTRAL, 1, 1, [], 'Goblin', nil)
-  # args.state.goblinKing ||= Enemy.new('Goblin King', 1, 10, 0, 5, 2, 1, 1, Elements::NEUTRAL, 1, 1, [], 'Goblin', nil)
-  # args.state.iceman ||= Enemy.new('Ice Man', 1, 8, 5, 5, 2, 1, 1, Elements::FIRE, 1, 1, [], 'Frost', nil)
-  # args.state.bat ||= Enemy.new('Bat', 1, 13, 3, 10, 3, 1, 1, Elements::NEUTRAL, 1, 1, [], 'Flying', nil)
 end
 
 module Enemy_types
@@ -46,6 +37,7 @@ end
 module Enemies
   include Elements
   include Enemy_types
-  GOBLIN = Enemy.new('Goblin', 1, 10, 0, 5, 2, 1, 1, ICE, 1, 1, [], GOBLIN, nil)
-  POTATO_THIEF = Enemy.new('Potato Thief', 1, 10, 0, 5, 2, 1, 1, NEUTRAL, 1, 1, [], GOBLIN, nil)
+  include Items
+  GOBLIN = Enemy.new('Goblin', 1, 10, 0, 5, 2, 1, 1, ICE, 1, 10, [], GOBLIN, nil)
+  POTATO_THIEF = Enemy.new('Potato Thief', 1, 10, 0, 5, 2, 1, 1, NEUTRAL, 1, 20, [], GOBLIN, nil)
 end
