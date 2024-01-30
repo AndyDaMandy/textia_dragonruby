@@ -9,8 +9,47 @@ def level_up(char)
   char.m_atk += 1
   char.m_def += 1
   char.luck += 1
+  learn_skills(char)
 end
 
+def learn_skills(char)
+  case char.name
+  when 'Ando'
+    if char.level == 2
+      char.skills.push(BASHER)
+    elsif char.level == 3
+      char.skills.push(ICE_SLASH)
+    end
+  when 'Marie'
+    if char.level == 2
+      char.skills.push(FIRE)
+    elsif char.level == 3
+      char.skills.push(BURN)
+    end
+  when 'Julie'
+    if char.level == 4
+      char.skills.push(SLASH_ALL)
+    elsif char.level == 5
+      char.skills.push(POISON)
+    end
+  when 'Ari'
+    if char.level == 6
+      char.skills.push(SLEEP)
+    elsif char.level == 7
+      char.skills.push(HEAL)
+    end
+  when 'Gabriel'
+    if char.level == 8
+      char.skills.push(ICE_SLASH)
+    elsif char.level == 9
+      char.skills.push(BURN)
+    end
+  else
+    # this shouldn't happen
+    puts "error at: learn_skills"
+    puts "char.name didn't match any case"
+  end
+end
 
 # variables
 # args.state.turn - handles moving between battle flow
@@ -361,26 +400,31 @@ def item_button_generator(position, state, args)
   # this will create a button for each item
 end
 
-def attack_calculation(player, enemy, args)
+def attack_calculation(player, enemy, enemy_hp, args)
   # this will calculate the damage done to the enemy
   #TODO create a method that will calculate the damage done to the enemy
-  args.state.elemental_advantage ||= 0
+  args.state.elemental_advantage ||= 1
   case args.state.choice
   when 0
     # attack
     if player.weapon.element == enemy.weakness
-      args.state.elemental_advantage = 2
+      args.state.elemental_advantage = 1.5
     else
       args.state.elemental_advantage = 1
     end
-    damage = player.p_atk *args.state.element_advantage - enemy.p_def
-    if damage < 0
-      damage = 2
+    damage = player.p_atk * args.state.element_advantage - enemy.p_def
+    damage = damage.round
+    if damage <= 0
+      # minimum damage is 1
+      damage = 1
     end
-    enemy.chp -= damage
-    if enemy.chp <= 0
+    # this calculation is incorrect, enemy hp is copied to a mutable array... so it's not actually changing the enemy hp
+    # Idea, replace array with an array of hashes? No, that doesn't work.
+    enemy_hp -= damage
+    if enemy_hp <= 0
       enemy.chp = 0
       args.state.enemy_party.delete(enemy)
+      a
       # we need to show that this happened
     end
   when 1
