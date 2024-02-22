@@ -63,6 +63,8 @@ class Battle
   end
 end
 
+# testing switch to ssh
+
 def level_up(char)
   char.level += 1
   char.hp += 1
