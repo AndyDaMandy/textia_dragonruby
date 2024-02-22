@@ -1,3 +1,68 @@
+# TODO - refactor the battle system to be a class
+class Battle
+  attr_accessor :player_party, :enemy_party, :turn, :choice, :target, :dark_mode
+  def initialize(player_party, enemy_party)
+    @player_party = player_party
+    @enemy_party = enemy_party
+    @turn = 0
+    @choice = 0
+    @target = nil
+    @dark_mode = false
+  end
+
+  def level_up(char)
+    char.level += 1
+    char.hp += 1
+    char.chp += 1
+    char.mp += 1
+    char.cmp += 1
+    char.p_atk += 1
+    char.p_def += 1
+    char.m_atk += 1
+    char.m_def += 1
+    char.luck += 1
+    learn_skills(char)
+  end
+  def learn_skills(char)
+    case char.name
+    when 'Ando'
+      if char.level == 2
+        char.skills.push(BASHER)
+      elsif char.level == 3
+        char.skills.push(ICE_SLASH)
+      end
+    when 'Marie'
+      if char.level == 2
+        char.skills.push(FIRE)
+      elsif char.level == 3
+        char.skills.push(BURN)
+      end
+    when 'Julie'
+      if char.level == 4
+        char.skills.push(SLASH_ALL)
+      elsif char.level == 5
+        char.skills.push(POISON)
+      end
+    when 'Ari'
+      if char.level == 6
+        char.skills.push(SLEEP)
+      elsif char.level == 7
+        char.skills.push(HEAL)
+      end
+    when 'Gabriel'
+      if char.level == 8
+        char.skills.push(ICE_SLASH)
+      elsif char.level == 9
+        char.skills.push(BURN)
+      end
+    else
+      # this shouldn't happen
+      puts "error at: learn_skills"
+      puts "char.name didn't match any case"
+    end
+  end
+end
+
 def level_up(char)
   char.level += 1
   char.hp += 1
